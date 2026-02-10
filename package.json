@@ -1,0 +1,28 @@
+{
+  "name": "jamy-truck-game",
+  "version": "1.0.0",
+  "description": "Top-down truck driving game in pixel art for browser",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "gen-assets": "node scripts/gen-assets.js"
+  },
+  "keywords": [
+    "game",
+    "phaser",
+    "truck",
+    "pixel-art",
+    "arcade"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "phaser": "^3.80.1"
+  },
+  "devDependencies": {
+    "vite": "^5.0.12",
+    "canvas": "^2.11.2"
+  }
+}
