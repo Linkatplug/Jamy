@@ -87,6 +87,15 @@ export default class BootScene extends Phaser.Scene {
   }
 
   createFallbackTextures() {
+    // Create pixel texture for particles
+    if (!this.textures.exists('pixel')) {
+      const graphics = this.add.graphics();
+      graphics.fillStyle(0xffffff, 1);
+      graphics.fillRect(0, 0, 4, 4);
+      graphics.generateTexture('pixel', 4, 4);
+      graphics.destroy();
+    }
+    
     // Check if truck texture exists, if not create it
     if (!this.textures.exists('truck')) {
       const graphics = this.add.graphics();
