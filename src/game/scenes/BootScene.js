@@ -12,10 +12,15 @@ export default class BootScene extends Phaser.Scene {
     // Create loading bar
     this.createLoadingBar();
     
-    // Load game assets
+    // Try to load game assets
     this.load.image('truck', '/assets/sprites/truck.png');
     this.load.image('trailer', '/assets/sprites/trailer.png');
     this.load.image('tiles', '/assets/sprites/tiles.png');
+    
+    // Handle load errors - create fallback textures
+    this.load.on('loaderror', (fileObj) => {
+      console.warn(`Failed to load ${fileObj.key}, will create fallback`);
+    });
     
     // Loading progress events
     this.load.on('progress', this.updateLoadingBar, this);
@@ -72,9 +77,78 @@ export default class BootScene extends Phaser.Scene {
   }
 
   onLoadComplete() {
+    // Create fallback textures for any missing assets
+    this.createFallbackTextures();
+    
     // Small delay before transitioning to menu
     this.time.delayedCall(500, () => {
       this.scene.start('MenuScene');
     });
+  }
+
+  createFallbackTextures() {
+    // Check if truck texture exists, if not create it
+    if (!this.textures.exists('truck')) {
+      const graphics = this.add.graphics();
+      
+      // Truck body (red)
+      graphics.fillStyle(0xDC143C, 1);
+      graphics.fillRect(4, 10, 14, 12);
+      
+      // Truck cab (blue)
+      graphics.fillStyle(0x4169E1, 1);
+      graphics.fillRect(18, 8, 10, 16);
+      
+      // Windshield (light blue)
+      graphics.fillStyle(0x87CEEB, 1);
+      graphics.fillRect(24, 10, 3, 6);
+      
+      // Wheels (black)
+      graphics.fillStyle(0x000000, 1);
+      graphics.fillCircle(8, 24, 3);
+      graphics.fillCircle(13, 24, 3);
+      graphics.fillCircle(23, 24, 3);
+      
+      graphics.generateTexture('truck', 32, 32);
+      graphics.destroy();
+    }
+    
+    // Check if trailer texture exists
+    if (!this.textures.exists('trailer')) {
+      const graphics = this.add.graphics();
+      
+      // Trailer body (gray)
+      graphics.fillStyle(0xA9A9A9, 1);
+      graphics.fillRect(2, 4, 12, 36);
+      
+      // Wheels (black)
+      graphics.fillStyle(0x000000, 1);
+      graphics.fillCircle(5, 42, 3);
+      graphics.fillCircle(11, 42, 3);
+      
+      graphics.generateTexture('trailer', 16, 48);
+      graphics.destroy();
+    }
+    
+    // Check if tiles texture exists
+    if (!this.textures.exists('tiles')) {
+      const graphics = this.add.graphics();
+      
+      // Simple colored tiles
+      graphics.fillStyle(0x228B22, 1);
+      graphics.fillRect(0, 0, 32, 32);
+      
+      graphics.fillStyle(0x444444, 1);
+      graphics.fillRect(32, 0, 32, 32);
+      
+      graphics.fillStyle(0x8B4513, 1);
+      graphics.fillRect(64, 0, 32, 32);
+      
+      graphics.fillStyle(0x1E90FF, 1);
+      graphics.fillRect(96, 0, 32, 32);
+      
+      graphics.generateTexture('tiles', 128, 64);
+      graphics.destroy();
+    }
   }
 }
