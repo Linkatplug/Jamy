@@ -4,6 +4,28 @@ A top-down truck driving game in pixel art style for web browsers. Drive an Amer
 
 ![Game Preview](docs/preview.png)
 
+## ⚠️ IMPORTANT: How to Run
+
+**DO NOT open `index.html` directly in your browser!** This will result in a white screen and CORS errors.
+
+This game uses modern JavaScript modules that require a web server. You MUST use one of these methods:
+
+### Method 1: Development Server (Recommended)
+```bash
+npm install
+npm run gen-assets
+npm run dev
+```
+The game will open automatically at `http://localhost:3000`
+
+### Method 2: Production Build
+```bash
+npm install
+npm run gen-assets
+npm run build
+npm run preview
+```
+
 ## Features
 
 - 🚚 Top-down arcade truck driving physics
@@ -215,6 +237,49 @@ Tested on:
 - Firefox 88+
 - Safari 14+
 - Edge 90+
+
+## Troubleshooting
+
+### White Screen / CORS Error
+
+**Problem**: Opening `index.html` directly shows a white screen or CORS error:
+```
+Cross-Origin Request blocked: The Same Origin Policy disallows reading the remote resource at file:///src/main.js
+```
+
+**Solution**: You cannot open the HTML file directly. Use the development server:
+```bash
+npm run dev
+```
+
+**Why**: Modern browsers block ES6 module imports from `file://` protocol for security reasons. The game requires an HTTP server to run.
+
+### Game Won't Start After npm run dev
+
+**Problem**: The browser opens but shows an error.
+
+**Solutions**:
+1. Make sure you ran `npm install` first
+2. Generate assets: `npm run gen-assets`
+3. Check that port 3000 is not already in use
+4. Try clearing your browser cache (Ctrl+Shift+Delete)
+
+### Assets Not Loading
+
+**Problem**: Sprites or images don't appear.
+
+**Solution**: Run the asset generation script:
+```bash
+npm run gen-assets
+```
+
+The game includes fallback texture generation, so it should work even without the sprite files.
+
+### Node.js Not Installed
+
+**Problem**: Commands don't work or show "command not found".
+
+**Solution**: Install Node.js from [nodejs.org](https://nodejs.org) (LTS version recommended).
 
 ## License
 
