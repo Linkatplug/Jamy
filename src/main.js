@@ -1,29 +1,31 @@
 import Phaser from 'phaser';
-import { gameConfig } from './game/config.js';
+import BootScene from './scenes/BootScene.js';
 
-// Import scenes
-import BootScene from './game/scenes/BootScene.js';
-import MenuScene from './game/scenes/MenuScene.js';
-import GameScene from './game/scenes/GameScene.js';
-import EndScene from './game/scenes/EndScene.js';
+// Configuration du jeu avec canvas pixel-perfect low-res upscale
+const config = {
+  type: Phaser.AUTO,
+  parent: 'game',
+  width: 320,  // Résolution native basse (pixel art)
+  height: 240,
+  zoom: 3,     // Upscale x3 pour affichage = 960x720
+  pixelArt: true,  // Active le rendu pixel-perfect
+  roundPixels: true,  // Arrondit les positions des pixels
+  scale: {
+    mode: Phaser.Scale.FIT,
+    autoCenter: Phaser.Scale.CENTER_BOTH
+  },
+  backgroundColor: '#2d2d2d',
+  physics: {
+    default: 'arcade',
+    arcade: {
+      gravity: { y: 0 },  // Pas de gravité pour un jeu top-down
+      debug: false
+    }
+  },
+  scene: [BootScene]
+};
 
-// Add scenes to config
-gameConfig.scene = [BootScene, MenuScene, GameScene, EndScene];
-
-// Create and start the game
-const game = new Phaser.Game(gameConfig);
-
-// Handle window focus/blur for pause
-window.addEventListener('blur', () => {
-  if (game.scene.isActive('GameScene')) {
-    game.scene.pause('GameScene');
-  }
-});
-
-window.addEventListener('focus', () => {
-  if (game.scene.isPaused('GameScene')) {
-    // Don't auto-resume, let player press ESC
-  }
-});
+// Création de l'instance du jeu
+const game = new Phaser.Game(config);
 
 export default game;
