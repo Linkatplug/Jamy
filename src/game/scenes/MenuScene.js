@@ -70,10 +70,10 @@ export default class MenuScene extends Phaser.Scene {
     });
     
     // Enhanced start button with glow effect
-    const startButtonGlow = this.add.rectangle(width / 2, height / 2 + 60, 200, 60, 0x00ff00, 0.3);
+    const startButtonGlow = this.add.rectangle(width / 2, height / 2 + 40, 200, 60, 0x00ff00, 0.3);
     startButtonGlow.setVisible(false);
     
-    const startButton = this.add.text(width / 2, height / 2 + 60, '▶ START', {
+    const startButton = this.add.text(width / 2, height / 2 + 40, '▶ START', {
       fontSize: '36px',
       fontFamily: 'Arial',
       color: '#ffffff',
@@ -81,6 +81,17 @@ export default class MenuScene extends Phaser.Scene {
       padding: { x: 40, y: 15 },
       stroke: '#000000',
       strokeThickness: 4
+    }).setOrigin(0.5).setInteractive();
+    
+    // Leaderboard button
+    const leaderboardButton = this.add.text(width / 2, height / 2 + 110, '🏆 LEADERBOARD', {
+      fontSize: '28px',
+      fontFamily: 'Arial',
+      color: '#ffffff',
+      backgroundColor: '#1e3a5f',
+      padding: { x: 30, y: 12 },
+      stroke: '#000000',
+      strokeThickness: 3
     }).setOrigin(0.5).setInteractive();
     
     // Button hover effects with sound
@@ -114,18 +125,57 @@ export default class MenuScene extends Phaser.Scene {
       });
     });
     
-    // Idle animation for button
+    // Leaderboard button interactions
+    leaderboardButton.on('pointerover', () => {
+      leaderboardButton.setStyle({ backgroundColor: '#2e4a6f' });
+      this.audioSystem.playClick();
+      this.tweens.add({
+        targets: leaderboardButton,
+        scale: 1.1,
+        duration: 100
+      });
+    });
+    
+    leaderboardButton.on('pointerout', () => {
+      leaderboardButton.setStyle({ backgroundColor: '#1e3a5f' });
+      this.tweens.add({
+        targets: leaderboardButton,
+        scale: 1,
+        duration: 100
+      });
+    });
+    
+    leaderboardButton.on('pointerdown', () => {
+      this.audioSystem.playPickup();
+      this.cameras.main.fade(200, 0, 0, 0);
+      this.time.delayedCall(200, () => {
+        this.audioSystem.destroy();
+        this.scene.start('LeaderboardScene');
+      });
+    });
+    
+    // Idle animation for buttons
     this.tweens.add({
       targets: startButton,
-      y: height / 2 + 60 + 5,
+      y: height / 2 + 40 + 5,
       duration: 1000,
       yoyo: true,
       repeat: -1,
       ease: 'Sine.easeInOut'
     });
     
+    this.tweens.add({
+      targets: leaderboardButton,
+      y: height / 2 + 110 + 5,
+      duration: 1200,
+      yoyo: true,
+      repeat: -1,
+      ease: 'Sine.easeInOut',
+      delay: 200
+    });
+    
     // Controls section with better layout
-    const controlsY = height / 2 + 140;
+    const controlsY = height / 2 + 180;
     
     const controlsTitle = this.add.text(width / 2, controlsY, '⌨️ CONTROLS', {
       fontSize: '20px',

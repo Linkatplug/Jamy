@@ -1,8 +1,9 @@
 import Phaser from 'phaser';
 import AudioSystem from '../systems/AudioSystem.js';
+import LeaderboardSystem from '../systems/LeaderboardSystem.js';
 
 /**
- * EndScene - Enhanced results screen with detailed stats and bonuses
+ * EndScene - Enhanced results screen with detailed stats, bonuses, and leaderboard integration
  */
 export default class EndScene extends Phaser.Scene {
   constructor() {
@@ -11,13 +12,16 @@ export default class EndScene extends Phaser.Scene {
 
   init(data) {
     this.missionData = data;
+    this.playerName = localStorage.getItem('jamy_player_name') || '';
+    this.nameInputActive = false;
   }
 
   create() {
     const { width, height } = this.cameras.main;
     
-    // Initialize audio
+    // Initialize audio and leaderboard
     this.audioSystem = new AudioSystem(this);
+    this.leaderboard = new LeaderboardSystem();
     
     // Animated background
     const bg = this.add.rectangle(width / 2, height / 2, width, height, 0x1a1a1a);
@@ -84,14 +88,120 @@ export default class EndScene extends Phaser.Scene {
         }
       });
       
-      yPos += 50;
+      yPos += 40;
+      
+      // Check if qualifies for leaderboard
+      if (this.leaderboard.qualifiesForLeaderboard(this.missionData.score)) {
+        yPos += 10;
+        const qualifyText = this.add.text(width / 2, yPos, '⭐ NEW HIGH SCORE! ⭐', {
+          fontSize: '22px',
+          fontFamily: 'Arial',
+          color: '#FFD700',
+          fontStyle: 'bold',
+          stroke: '#000000',
+          strokeThickness: 3
+        }).setOrigin(0.5);
+        
+        // Blinking animation
+        this.tweens.add({
+          targets: qualifyText,
+          alpha: { from: 0.5, to: 1 },
+          duration: 500,
+          yoyo: true,
+          repeat: -1
+        });
+        
+        yPos += 35;
+        
+        // Show name input if needed
+        if (!this.playerName) {
+          this.showNameInput(width, yPos);
+          yPos += 60;
+        } else {
+          // Save score immediately
+          const rank = this.leaderboard.saveScore(this.playerName, this.missionData.score, this.missionData.missionName);
+          this.add.text(width / 2, yPos, `Rank: #${rank} - ${this.playerName}`, {
+            fontSize: '20px',
+            fontFamily: 'Arial',
+            color: '#00ffff'
+          }).setOrigin(0.5);
+          yPos += 30;
+        }
+      }
+      
+      yPos += 10;
     }
     
+    // Stats section (continue with rest of method...)
+    this.displayStats(yPos, success, width, height);
+  }
+
+  showNameInput(width, yPos) {
+    this.add.text(width / 2, yPos, 'Enter your name:', {
+      fontSize: '18px',
+      fontFamily: 'Arial',
+      color: '#ffffff'
+    }).setOrigin(0.5);
+    
+    // Name input box
+    const inputBox = this.add.rectangle(width / 2, yPos + 30, 200, 40, 0x333333);
+    inputBox.setStrokeStyle(2, 0xFFD700);
+    
+    this.nameText = this.add.text(width / 2, yPos + 30, this.playerName || '_', {
+      fontSize: '20px',
+      fontFamily: 'Arial',
+      color: '#ffffff',
+      fontStyle: 'bold'
+    }).setOrigin(0.5);
+    
+    this.nameInputActive = true;
+    
+    // Keyboard input
+    this.input.keyboard.on('keydown', (event) => {
+      if (!this.nameInputActive) return;
+      
+      if (event.key === 'Enter' && this.playerName.length > 0) {
+        this.submitName();
+      } else if (event.key === 'Backspace') {
+        this.playerName = this.playerName.slice(0, -1);
+        this.nameText.setText(this.playerName || '_');
+      } else if (event.key.length === 1 && this.playerName.length < 15) {
+        this.playerName += event.key;
+        this.nameText.setText(this.playerName);
+      }
+    });
+  }
+
+  submitName() {
+    if (this.playerName.length > 0) {
+      this.nameInputActive = false;
+      localStorage.setItem('jamy_player_name', this.playerName);
+      const rank = this.leaderboard.saveScore(this.playerName, this.missionData.score, this.missionData.missionName);
+      
+      // Show rank
+      const rankText = this.add.text(this.cameras.main.width / 2, 240, 
+        `Saved! Your rank: #${rank}`, {
+        fontSize: '20px',
+        fontFamily: 'Arial',
+        color: '#00ff00',
+        fontStyle: 'bold'
+      }).setOrigin(0.5);
+      
+      this.tweens.add({
+        targets: rankText,
+        scale: { from: 0.5, to: 1 },
+        duration: 300,
+        ease: 'Back.easeOut'
+      });
+    }
+  }
+
+  displayStats(yPos, success, width, height) {
     // Stats section
-    const statsBox = this.add.rectangle(width / 2, yPos + 50, width - 100, 130, 0x333333, 0.8);
+    const statsBox = this.add.rectangle(width / 2, yPos + 60, width - 100, 130, 0x333333, 0.8);
     statsBox.setStrokeStyle(2, success ? 0x00ff00 : 0xff0000);
     
-    const statsY = yPos + 10;
+    const statsY = yPos + 20;
     const lineHeight = 25;
     
     // Time stats

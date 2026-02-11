@@ -6,9 +6,10 @@ import BootScene from './game/scenes/BootScene.js';
 import MenuScene from './game/scenes/MenuScene.js';
 import GameScene from './game/scenes/GameScene.js';
 import EndScene from './game/scenes/EndScene.js';
+import LeaderboardScene from './game/scenes/LeaderboardScene.js';
 
 // Add scenes to config
-gameConfig.scene = [BootScene, MenuScene, GameScene, EndScene];
+gameConfig.scene = [BootScene, MenuScene, GameScene, EndScene, LeaderboardScene];
 
 // Create and start the game
 const game = new Phaser.Game(gameConfig);
