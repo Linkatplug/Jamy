@@ -7,16 +7,19 @@ import {
   MISSION_TYPES,
   MISSION_ZONES,
   SPEED_BONUS_THRESHOLD,
-  PERFECT_DELIVERY_BONUS
+  PERFECT_DELIVERY_BONUS,
+  LEVELS
 } from '../utils/constants.js';
 
 /**
- * MissionSystem - Enhanced mission system with multiple mission types
+ * MissionSystem - Enhanced mission system with multiple mission types and level support
  */
 export default class MissionSystem {
-  constructor(scene, missionType = MISSION_TYPES.STANDARD) {
+  constructor(scene, missionType = MISSION_TYPES.STANDARD, levelKey = 'LEVEL_1') {
     this.scene = scene;
     this.missionType = missionType;
+    this.levelKey = levelKey;
+    this.levelData = LEVELS[levelKey];
     this.reset();
     this.setupMission();
   }
@@ -58,9 +61,10 @@ export default class MissionSystem {
   setupStandardMission() {
     this.missionName = 'Standard Delivery';
     this.missionDescription = 'Pick up and deliver cargo';
+    // Use level-specific zones
     this.stops = [
-      { zone: PICKUP_ZONE, type: 'pickup', label: 'PICKUP' },
-      { zone: DELIVERY_ZONE, type: 'delivery', label: 'DELIVERY' }
+      { zone: this.levelData.pickupZone, type: 'pickup', label: 'PICKUP' },
+      { zone: this.levelData.deliveryZone, type: 'delivery', label: 'DELIVERY' }
     ];
   }
 
@@ -77,9 +81,10 @@ export default class MissionSystem {
   setupCarefulMission() {
     this.missionName = 'Careful Delivery';
     this.missionDescription = 'Fragile cargo - avoid collisions!';
+    // Use level-specific zones
     this.stops = [
-      { zone: PICKUP_ZONE, type: 'pickup', label: 'PICKUP' },
-      { zone: DELIVERY_ZONE, type: 'delivery', label: 'DELIVERY' }
+      { zone: this.levelData.pickupZone, type: 'pickup', label: 'PICKUP' },
+      { zone: this.levelData.deliveryZone, type: 'delivery', label: 'DELIVERY' }
     ];
   }
 
@@ -98,8 +103,9 @@ export default class MissionSystem {
   setupParkingMission() {
     this.missionName = 'Precision Parking';
     this.missionDescription = 'Park perfectly in the zone';
+    // Use level-specific delivery zone for parking
     this.stops = [
-      { zone: DELIVERY_ZONE, type: 'park', label: 'PARKING' }
+      { zone: this.levelData.deliveryZone, type: 'park', label: 'PARKING' }
     ];
   }
 
@@ -264,7 +270,8 @@ export default class MissionSystem {
 
   getTargetPosition() {
     if (this.currentStop >= this.stops.length) {
-      return { x: DELIVERY_ZONE.x + DELIVERY_ZONE.width / 2, y: DELIVERY_ZONE.y + DELIVERY_ZONE.height / 2 };
+      return { x: this.levelData.deliveryZone.x + this.levelData.deliveryZone.width / 2, 
+               y: this.levelData.deliveryZone.y + this.levelData.deliveryZone.height / 2 };
     }
     
     const zone = this.stops[this.currentStop].zone;

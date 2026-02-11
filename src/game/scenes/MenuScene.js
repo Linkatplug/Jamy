@@ -121,7 +121,7 @@ export default class MenuScene extends Phaser.Scene {
       this.cameras.main.flash(200, 255, 255, 255);
       this.time.delayedCall(200, () => {
         this.audioSystem.destroy();
-        this.scene.start('GameScene');
+        this.scene.start('LevelSelectScene');
       });
     });
     
@@ -256,7 +256,7 @@ export default class MenuScene extends Phaser.Scene {
       this.cameras.main.flash(200);
       this.time.delayedCall(200, () => {
         this.audioSystem.destroy();
-        this.scene.start('GameScene');
+        this.scene.start('LevelSelectScene');
       });
     });
   }

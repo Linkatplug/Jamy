@@ -36,7 +36,58 @@ export const MISSION_TYPES = {
   PARKING: 'parking' // Precision parking challenge
 };
 
-// Zones
+// Levels
+export const LEVELS = {
+  LEVEL_1: {
+    name: 'Level 1: City Streets',
+    difficulty: 'Easy',
+    mapWidth: 1600,
+    mapHeight: 900,
+    pickupZone: { x: 200, y: 200, width: 80, height: 80 },
+    deliveryZone: { x: 1200, y: 600, width: 100, height: 100 },
+    obstacles: [
+      { x: 400, y: 400, w: 80, h: 80 },
+      { x: 600, y: 150, w: 60, h: 60 },
+      { x: 700, y: 300, w: 40, h: 80 },
+      { x: 300, y: 500, w: 80, h: 40 },
+      { x: 900, y: 200, w: 50, h: 50 },
+      { x: 800, y: 650, w: 60, h: 60 },
+      { x: 1100, y: 400, w: 70, h: 50 },
+      { x: 1300, y: 250, w: 50, h: 70 },
+      { x: 200, y: 700, w: 60, h: 40 },
+      { x: 1400, y: 750, w: 80, h: 60 }
+    ],
+    spawnX: 150,
+    spawnY: 150
+  },
+  LEVEL_2: {
+    name: 'Level 2: Industrial Zone',
+    difficulty: 'Medium',
+    mapWidth: 1800,
+    mapHeight: 1000,
+    pickupZone: { x: 1500, y: 150, width: 90, height: 90 },
+    deliveryZone: { x: 300, y: 800, width: 110, height: 110 },
+    obstacles: [
+      { x: 500, y: 200, w: 100, h: 60 },
+      { x: 700, y: 400, w: 80, h: 80 },
+      { x: 900, y: 250, w: 70, h: 100 },
+      { x: 1100, y: 500, w: 90, h: 70 },
+      { x: 400, y: 600, w: 60, h: 90 },
+      { x: 800, y: 700, w: 100, h: 50 },
+      { x: 1300, y: 600, w: 80, h: 80 },
+      { x: 600, y: 100, w: 70, h: 70 },
+      { x: 200, y: 400, w: 60, h: 100 },
+      { x: 1000, y: 800, w: 90, h: 60 },
+      { x: 1500, y: 450, w: 70, h: 90 },
+      { x: 300, y: 200, w: 80, h: 60 },
+      { x: 1200, y: 150, w: 60, h: 70 }
+    ],
+    spawnX: 100,
+    spawnY: 100
+  }
+};
+
+// Zones (Legacy - use LEVELS instead)
 export const PICKUP_ZONE = { x: 200, y: 200, width: 80, height: 80 };
 export const DELIVERY_ZONE = { x: 1200, y: 600, width: 100, height: 100 };
 
@@ -69,5 +120,7 @@ export const COLORS = {
   DELIVERY_ZONE: 0xff0000,
   ROAD: 0x444444,
   GRASS: 0x228B22,
-  OBSTACLE: 0x8B4513
+  OBSTACLE: 0x8B4513,
+  LEVEL1_GRASS: 0x228B22,
+  LEVEL2_GRASS: 0x3a5f0b
 };

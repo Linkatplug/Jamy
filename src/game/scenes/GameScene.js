@@ -8,47 +8,55 @@ import UISystem from '../systems/UISystem.js';
 import CameraSystem from '../systems/CameraSystem.js';
 import AudioSystem from '../systems/AudioSystem.js';
 import { 
-  MAP_WIDTH, 
-  MAP_HEIGHT, 
-  PICKUP_ZONE, 
-  DELIVERY_ZONE, 
-  COLORS 
+  LEVELS,
+  COLORS,
+  MISSION_TYPES
 } from '../utils/constants.js';
 
 /**
- * GameScene - Main gameplay scene
+ * GameScene - Main gameplay scene with level support
  */
 export default class GameScene extends Phaser.Scene {
   constructor() {
     super({ key: 'GameScene' });
   }
 
+  init(data) {
+    // Get level data (default to LEVEL_1)
+    this.levelKey = data.levelKey || 'LEVEL_1';
+    this.levelData = LEVELS[this.levelKey];
+  }
+
   create() {
     this.isPaused = false;
     
+    // Use level-specific dimensions
+    const mapWidth = this.levelData.mapWidth;
+    const mapHeight = this.levelData.mapHeight;
+    
     // Set world bounds
-    this.physics.world.setBounds(0, 0, MAP_WIDTH, MAP_HEIGHT);
+    this.physics.world.setBounds(0, 0, mapWidth, mapHeight);
     
-    // Create map
-    this.createMap();
+    // Create map with level-specific settings
+    this.createMap(mapWidth, mapHeight);
     
-    // Create zones
+    // Create zones with level-specific positions
     this.createZones();
     
-    // Create obstacles
+    // Create obstacles with level-specific positions
     this.createObstacles();
     
-    // Create truck at spawn position
-    this.truck = new Truck(this, 150, 150);
+    // Create truck at level-specific spawn position
+    this.truck = new Truck(this, this.levelData.spawnX, this.levelData.spawnY);
     
     // Create trailer (optional - can be toggled)
     this.trailer = new Trailer(this, this.truck);
     
     // Initialize systems
     this.inputSystem = new InputSystem(this);
-    this.missionSystem = new MissionSystem(this);
+    this.missionSystem = new MissionSystem(this, MISSION_TYPES.STANDARD, this.levelKey);
     this.uiSystem = new UISystem(this, this.missionSystem);
-    this.cameraSystem = new CameraSystem(this, this.truck, { width: MAP_WIDTH, height: MAP_HEIGHT });
+    this.cameraSystem = new CameraSystem(this, this.truck, { width: mapWidth, height: mapHeight });
     this.audioSystem = new AudioSystem(this);
     
     // Initialize audio (create engine sound)
@@ -198,6 +206,13 @@ export default class GameScene extends Phaser.Scene {
     this.events.on('missionEnd', (data) => {
       if (data.success) {
         this.audioSystem.playDeliver();
+        // Mark level as complete
+        if (this.levelKey === 'LEVEL_1') {
+          localStorage.setItem('jamy_level1_complete', 'true');
+        }
+        // Add level info to mission data
+        data.levelKey = this.levelKey;
+        data.levelName = this.levelData.name;
       }
       this.audioSystem.stopAll();
       // Transition to end scene
