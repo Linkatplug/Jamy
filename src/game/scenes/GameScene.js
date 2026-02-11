@@ -73,55 +73,86 @@ export default class GameScene extends Phaser.Scene {
     this.createParticleEffects();
   }
 
-  createMap() {
+  createMap(mapWidth, mapHeight) {
     // Create simple map with grass background and roads
     const graphics = this.add.graphics();
     
+    // Determine grass color based on level
+    const grassColor = this.levelKey === 'LEVEL_2' ? COLORS.LEVEL2_GRASS : COLORS.LEVEL1_GRASS;
+    
     // Grass background
-    graphics.fillStyle(COLORS.GRASS, 1);
-    graphics.fillRect(0, 0, MAP_WIDTH, MAP_HEIGHT);
+    graphics.fillStyle(grassColor, 1);
+    graphics.fillRect(0, 0, mapWidth, mapHeight);
     
     // Main road (horizontal)
     graphics.fillStyle(COLORS.ROAD, 1);
-    graphics.fillRect(0, MAP_HEIGHT / 2 - 100, MAP_WIDTH, 200);
+    graphics.fillRect(0, mapHeight / 2 - 100, mapWidth, 200);
     
     // Road markings
     graphics.lineStyle(3, 0xFFFFFF, 1);
-    for (let x = 0; x < MAP_WIDTH; x += 60) {
-      graphics.strokeLineShape(new Phaser.Geom.Line(x, MAP_HEIGHT / 2, x + 30, MAP_HEIGHT / 2));
+    for (let x = 0; x < mapWidth; x += 60) {
+      graphics.strokeLineShape(new Phaser.Geom.Line(x, mapHeight / 2, x + 30, mapHeight / 2));
     }
     
     // Vertical road
     graphics.fillStyle(COLORS.ROAD, 1);
-    graphics.fillRect(400, 0, 200, MAP_HEIGHT);
+    graphics.fillRect(400, 0, 200, mapHeight);
     
     // Vertical road markings
-    for (let y = 0; y < MAP_HEIGHT; y += 60) {
+    for (let y = 0; y < mapHeight; y += 60) {
       graphics.strokeLineShape(new Phaser.Geom.Line(500, y, 500, y + 30));
     }
     
-    // Parking areas at zones
+    // Additional roads for level 2
+    if (this.levelKey === 'LEVEL_2') {
+      // Diagonal road
+      graphics.fillStyle(COLORS.ROAD, 1);
+      graphics.fillRect(800, 0, 200, mapHeight);
+      
+      // Diagonal road markings
+      for (let y = 0; y < mapHeight; y += 60) {
+        graphics.strokeLineShape(new Phaser.Geom.Line(900, y, 900, y + 30));
+      }
+    }
+    
+    // Parking areas at zones (use level-specific zones)
+    const pickupZone = this.levelData.pickupZone;
+    const deliveryZone = this.levelData.deliveryZone;
+    
     graphics.fillStyle(0x666666, 1);
-    graphics.fillRect(PICKUP_ZONE.x - 20, PICKUP_ZONE.y - 20, PICKUP_ZONE.width + 40, PICKUP_ZONE.height + 40);
-    graphics.fillRect(DELIVERY_ZONE.x - 20, DELIVERY_ZONE.y - 20, DELIVERY_ZONE.width + 40, DELIVERY_ZONE.height + 40);
+    graphics.fillRect(pickupZone.x - 20, pickupZone.y - 20, pickupZone.width + 40, pickupZone.height + 40);
+    graphics.fillRect(deliveryZone.x - 20, deliveryZone.y - 20, deliveryZone.width + 40, deliveryZone.height + 40);
     
     // Set depth to background
     graphics.setDepth(0);
   }
 
   createZones() {
+    // Use level-specific zones
+    const pickupZone = this.levelData.pickupZone;
+    const deliveryZone = this.levelData.deliveryZone;
+    
     // Pickup zone (green)
     const pickupGraphics = this.add.graphics();
     pickupGraphics.fillStyle(COLORS.PICKUP_ZONE, 0.3);
-    pickupGraphics.fillRect(PICKUP_ZONE.x, PICKUP_ZONE.y, PICKUP_ZONE.width, PICKUP_ZONE.height);
+    pickupGraphics.fillRect(pickupZone.x, pickupZone.y, pickupZone.width, pickupZone.height);
     pickupGraphics.lineStyle(3, COLORS.PICKUP_ZONE, 1);
-    pickupGraphics.strokeRect(PICKUP_ZONE.x, PICKUP_ZONE.y, PICKUP_ZONE.width, PICKUP_ZONE.height);
+    pickupGraphics.strokeRect(pickupZone.x, pickupZone.y, pickupZone.width, pickupZone.height);
     pickupGraphics.setDepth(1);
+    
+    // Add pulsing animation to pickup zone
+    this.tweens.add({
+      targets: pickupGraphics,
+      alpha: 0.5,
+      duration: 1000,
+      yoyo: true,
+      repeat: -1
+    });
     
     // Pickup label
     this.add.text(
-      PICKUP_ZONE.x + PICKUP_ZONE.width / 2,
-      PICKUP_ZONE.y + PICKUP_ZONE.height / 2,
+      pickupZone.x + pickupZone.width / 2,
+      pickupZone.y + pickupZone.height / 2,
       'PICKUP',
       {
         fontSize: '16px',
@@ -136,15 +167,24 @@ export default class GameScene extends Phaser.Scene {
     // Delivery zone (red)
     const deliveryGraphics = this.add.graphics();
     deliveryGraphics.fillStyle(COLORS.DELIVERY_ZONE, 0.3);
-    deliveryGraphics.fillRect(DELIVERY_ZONE.x, DELIVERY_ZONE.y, DELIVERY_ZONE.width, DELIVERY_ZONE.height);
+    deliveryGraphics.fillRect(deliveryZone.x, deliveryZone.y, deliveryZone.width, deliveryZone.height);
     deliveryGraphics.lineStyle(3, COLORS.DELIVERY_ZONE, 1);
-    deliveryGraphics.strokeRect(DELIVERY_ZONE.x, DELIVERY_ZONE.y, DELIVERY_ZONE.width, DELIVERY_ZONE.height);
+    deliveryGraphics.strokeRect(deliveryZone.x, deliveryZone.y, deliveryZone.width, deliveryZone.height);
     deliveryGraphics.setDepth(1);
+    
+    // Add pulsing animation to delivery zone
+    this.tweens.add({
+      targets: deliveryGraphics,
+      alpha: 0.5,
+      duration: 1000,
+      yoyo: true,
+      repeat: -1
+    });
     
     // Delivery label
     this.add.text(
-      DELIVERY_ZONE.x + DELIVERY_ZONE.width / 2,
-      DELIVERY_ZONE.y + DELIVERY_ZONE.height / 2,
+      deliveryZone.x + deliveryZone.width / 2,
+      deliveryZone.y + deliveryZone.height / 2,
       'DELIVERY',
       {
         fontSize: '16px',
@@ -160,18 +200,8 @@ export default class GameScene extends Phaser.Scene {
   createObstacles() {
     this.obstaclesGroup = this.physics.add.group();
     
-    // Create some obstacles around the map
-    const obstaclePositions = [
-      { x: 600, y: 150, w: 60, h: 60 },
-      { x: 700, y: 300, w: 40, h: 80 },
-      { x: 300, y: 500, w: 80, h: 40 },
-      { x: 900, y: 200, w: 50, h: 50 },
-      { x: 800, y: 650, w: 60, h: 60 },
-      { x: 1100, y: 400, w: 70, h: 50 },
-      { x: 1300, y: 250, w: 50, h: 70 },
-      { x: 200, y: 700, w: 60, h: 40 },
-      { x: 1400, y: 750, w: 80, h: 60 }
-    ];
+    // Use level-specific obstacle positions
+    const obstaclePositions = this.levelData.obstacles;
     
     obstaclePositions.forEach(pos => {
       const obstacle = new Obstacle(this, pos.x, pos.y, pos.w, pos.h, COLORS.OBSTACLE);

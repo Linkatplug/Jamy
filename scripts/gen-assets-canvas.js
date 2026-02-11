@@ -2,6 +2,7 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { PNG } from 'pngjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -14,7 +15,6 @@ if (!fs.existsSync(assetsDir)) {
 // Function to create a simple PNG with raw pixel data
 function createPNG(width, height, pixelData) {
   // This creates a minimal valid PNG file
-  const PNG = require('pngjs').PNG;
   const png = new PNG({ width, height });
   
   for (let y = 0; y < height; y++) {
