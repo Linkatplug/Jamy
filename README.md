@@ -157,8 +157,28 @@ Jamy/
 
 ### Adding Your Own Sprites
 
-The game uses auto-generated placeholder sprites by default. To use your own:
+The game supports custom sprites through an automated integration system.
 
+#### Easy Method (Recommended)
+1. Place your custom images in the `datapack/` directory:
+   - **Jamy_truck.png** - Your custom truck (tracteur) artwork
+   - **Jamy_remo.png** - Your custom trailer (remorque) artwork
+   
+2. Run the integration script:
+   ```bash
+   npm run integrate-sprites
+   ```
+   
+3. The script automatically resizes your images to the correct dimensions:
+   - Truck: 32x32 pixels
+   - Trailer: 16x48 pixels
+
+4. Start the game to see your custom sprites:
+   ```bash
+   npm run dev
+   ```
+
+#### Manual Method
 1. **Truck sprite**: Replace `public/assets/sprites/truck.png` with your own 32x32 pixel art truck
 2. **Trailer sprite**: Replace `public/assets/sprites/trailer.png` with your own 16x48 pixel art trailer
 3. **Tiles**: Replace `public/assets/sprites/tiles.png` with your own tileset
@@ -231,6 +251,7 @@ Simply upload the contents of the `dist/` folder to any static hosting service:
 - `npm run build` - Create production build
 - `npm run preview` - Preview production build locally
 - `npm run gen-assets` - Generate placeholder sprite assets
+- `npm run integrate-sprites` - Integrate custom sprites from datapack/ directory
 
 ### Adding Features
 

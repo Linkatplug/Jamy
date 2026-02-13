@@ -149,6 +149,17 @@ export default class MissionSystem {
     });
   }
 
+  addTrafficBonus(points) {
+    // Add bonus points for crushing traffic vehicles (Carmageddon style!)
+    this.crushScore += points;
+    this.scene.events.emit('crushScoreChanged', {
+      crushScore: this.crushScore,
+      crushStats: this.crushStats,
+      delta: points,
+      type: 'traffic'
+    });
+  }
+
   checkPickupZone(truck) {
     if (this.currentStop >= this.stops.length) return false;
 

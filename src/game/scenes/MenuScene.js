@@ -245,8 +245,8 @@ export default class MenuScene extends Phaser.Scene {
     // Keyboard shortcut to start
     this.input.keyboard.once('keydown-SPACE', () => {
       this.audioSystem.playPickup();
-      this.cameras.main.flash(200);
-      this.time.delayedCall(200, () => {
+      this.cameras.main.flash(100); // Reduced from 200ms to 100ms
+      this.time.delayedCall(100, () => {
         this.audioSystem.destroy();
         this.scene.start('LevelSelectScene');
       });
