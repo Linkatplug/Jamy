@@ -255,17 +255,29 @@ export default class GameScene extends Phaser.Scene {
 
     this.physics.add.collider(this.pedestrians, this.obstaclesGroup);
 
-    const evade = (_vehicle, pedestrian) => {
-      pedestrian.pickNewDirection(this.truck.x, this.truck.y);
-      this.createAlertParticles(pedestrian.x, pedestrian.y);
-      this.truck.handleCollision();
-    };
+    this.physics.add.overlap(this.truck, this.pedestrians, (_vehicle, pedestrian) => {
+      const speed = Math.abs(this.truck.getSpeed());
+      if (!pedestrian.isCrushed && speed > 120 && !this.truck.isJumping) {
+        pedestrian.isCrushed = true;
+        this.paintRedTrail(pedestrian.x, pedestrian.y);
+        pedestrian.destroy();
+      } else {
+        pedestrian.pickNewDirection(this.truck.x, this.truck.y);
+        this.createAlertParticles(pedestrian.x, pedestrian.y);
+      }
+    });
 
-    this.physics.add.overlap(this.truck, this.pedestrians, evade);
     if (this.trailer) {
       this.physics.add.overlap(this.trailer, this.pedestrians, (_trailer, pedestrian) => {
-        pedestrian.pickNewDirection(this.trailer.x, this.trailer.y);
-        this.createAlertParticles(pedestrian.x, pedestrian.y);
+        const speed = Math.abs(this.truck.getSpeed());
+        if (!pedestrian.isCrushed && speed > 115 && !this.truck.isJumping) {
+          pedestrian.isCrushed = true;
+          this.paintRedTrail(pedestrian.x, pedestrian.y);
+          pedestrian.destroy();
+        } else {
+          pedestrian.pickNewDirection(this.trailer.x, this.trailer.y);
+          this.createAlertParticles(pedestrian.x, pedestrian.y);
+        }
       });
     }
   }
@@ -392,7 +404,14 @@ export default class GameScene extends Phaser.Scene {
 
     if (this.trailer) {
       this.physics.add.overlap(this.trailer, this.squirrels, (_trailer, squirrel) => {
-        squirrel.pickNewDirection(this.trailer.x, this.trailer.y);
+        const speed = Math.abs(this.truck.getSpeed());
+        if (!squirrel.isCrushed && speed > 130 && !this.truck.isJumping) {
+          squirrel.isCrushed = true;
+          this.paintRedTrail(squirrel.x, squirrel.y);
+          squirrel.destroy();
+        } else {
+          squirrel.pickNewDirection(this.trailer.x, this.trailer.y);
+        }
       });
     }
   }

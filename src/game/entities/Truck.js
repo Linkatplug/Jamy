@@ -94,14 +94,14 @@ export default class Truck extends Phaser.Physics.Arcade.Sprite {
     if (this.isJumping || this.jumpCooldown > 0) return;
 
     this.isJumping = true;
-    this.jumpTimer = 0.42;
-    this.jumpCooldown = 1.0;
+    this.jumpTimer = 0.75;
+    this.jumpCooldown = 1.2;
 
     this.scene.tweens.add({
       targets: this,
-      scaleX: 1.16,
-      scaleY: 1.16,
-      duration: 110,
+      scaleX: 1.32,
+      scaleY: 1.32,
+      duration: 140,
       yoyo: true,
       ease: 'Sine.easeOut'
     });
@@ -114,10 +114,12 @@ export default class Truck extends Phaser.Physics.Arcade.Sprite {
 
     if (this.isJumping) {
       this.jumpTimer -= deltaSeconds;
-      this.setAlpha(0.82);
+      this.setAlpha(0.75);
+      this.setDepth(14);
       if (this.jumpTimer <= 0) {
         this.isJumping = false;
         this.setAlpha(1);
+        this.setDepth(10);
       }
     }
   }
