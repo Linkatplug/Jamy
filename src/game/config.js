@@ -6,7 +6,7 @@ export const gameConfig = {
   width: GAME_WIDTH,
   height: GAME_HEIGHT,
   parent: 'game-container',
-  backgroundColor: '#228B22',
+  backgroundColor: '#2f3a33',
   
   // Pixel art settings
   pixelArt: true,
@@ -19,7 +19,7 @@ export const gameConfig = {
     autoCenter: Phaser.Scale.CENTER_BOTH,
     width: GAME_WIDTH,
     height: GAME_HEIGHT,
-    zoom: 2 // 2x upscale
+    zoom: 1 // render at native resolution for better readability
   },
   
   // Physics configuration

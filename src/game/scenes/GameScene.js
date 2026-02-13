@@ -79,42 +79,48 @@ export default class GameScene extends Phaser.Scene {
     
     // Determine grass color based on level
     const grassColor = this.levelKey === 'LEVEL_2' ? COLORS.LEVEL2_GRASS : COLORS.LEVEL1_GRASS;
+    const laneColor = 0xf4f0dd;
+    const shoulderColor = 0x6a6f73;
     
     // Grass background
     graphics.fillStyle(grassColor, 1);
     graphics.fillRect(0, 0, mapWidth, mapHeight);
     
-    // Main road (horizontal)
+    // Main roads (scaled to map size for better readability)
+    const horizontalRoadY = mapHeight * 0.52;
+    const verticalRoadX = mapWidth * 0.32;
+
+    graphics.fillStyle(shoulderColor, 1);
+    graphics.fillRect(0, horizontalRoadY - 116, mapWidth, 232);
+    graphics.fillRect(verticalRoadX - 116, 0, 232, mapHeight);
+
     graphics.fillStyle(COLORS.ROAD, 1);
-    graphics.fillRect(0, mapHeight / 2 - 100, mapWidth, 200);
-    
+    graphics.fillRect(0, horizontalRoadY - 94, mapWidth, 188);
+    graphics.fillRect(verticalRoadX - 94, 0, 188, mapHeight);
+
     // Road markings
-    graphics.lineStyle(3, 0xFFFFFF, 1);
-    for (let x = 0; x < mapWidth; x += 60) {
-      graphics.strokeLineShape(new Phaser.Geom.Line(x, mapHeight / 2, x + 30, mapHeight / 2));
+    graphics.lineStyle(4, laneColor, 0.9);
+    for (let x = 0; x < mapWidth; x += 84) {
+      graphics.strokeLineShape(new Phaser.Geom.Line(x, horizontalRoadY, x + 42, horizontalRoadY));
     }
-    
-    // Vertical road
-    graphics.fillStyle(COLORS.ROAD, 1);
-    graphics.fillRect(400, 0, 200, mapHeight);
-    
-    // Vertical road markings
-    for (let y = 0; y < mapHeight; y += 60) {
-      graphics.strokeLineShape(new Phaser.Geom.Line(500, y, 500, y + 30));
+
+    for (let y = 0; y < mapHeight; y += 84) {
+      graphics.strokeLineShape(new Phaser.Geom.Line(verticalRoadX, y, verticalRoadX, y + 42));
     }
-    
-    // Additional roads for level 2
-    if (this.levelKey === 'LEVEL_2') {
-      // Diagonal road
+
+    // Additional lane for larger missions
+    if (this.levelData.mapWidth >= 1800) {
+      const extraRoadX = mapWidth * 0.7;
+      graphics.fillStyle(shoulderColor, 1);
+      graphics.fillRect(extraRoadX - 96, 0, 192, mapHeight);
       graphics.fillStyle(COLORS.ROAD, 1);
-      graphics.fillRect(800, 0, 200, mapHeight);
-      
-      // Diagonal road markings
-      for (let y = 0; y < mapHeight; y += 60) {
-        graphics.strokeLineShape(new Phaser.Geom.Line(900, y, 900, y + 30));
+      graphics.fillRect(extraRoadX - 78, 0, 156, mapHeight);
+
+      for (let y = 0; y < mapHeight; y += 84) {
+        graphics.strokeLineShape(new Phaser.Geom.Line(extraRoadX, y, extraRoadX, y + 42));
       }
     }
-    
+
     // Parking areas at zones (use level-specific zones)
     const pickupZone = this.levelData.pickupZone;
     const deliveryZone = this.levelData.deliveryZone;
@@ -134,9 +140,9 @@ export default class GameScene extends Phaser.Scene {
     
     // Pickup zone (green)
     const pickupGraphics = this.add.graphics();
-    pickupGraphics.fillStyle(COLORS.PICKUP_ZONE, 0.3);
+    pickupGraphics.fillStyle(COLORS.PICKUP_ZONE, 0.24);
     pickupGraphics.fillRect(pickupZone.x, pickupZone.y, pickupZone.width, pickupZone.height);
-    pickupGraphics.lineStyle(3, COLORS.PICKUP_ZONE, 1);
+    pickupGraphics.lineStyle(3, COLORS.PICKUP_ZONE, 0.9);
     pickupGraphics.strokeRect(pickupZone.x, pickupZone.y, pickupZone.width, pickupZone.height);
     pickupGraphics.setDepth(1);
     
@@ -157,7 +163,7 @@ export default class GameScene extends Phaser.Scene {
       {
         fontSize: '16px',
         fontFamily: 'Arial',
-        color: '#00ff00',
+        color: '#d8f2de',
         stroke: '#000000',
         strokeThickness: 3,
         fontStyle: 'bold'
@@ -166,9 +172,9 @@ export default class GameScene extends Phaser.Scene {
     
     // Delivery zone (red)
     const deliveryGraphics = this.add.graphics();
-    deliveryGraphics.fillStyle(COLORS.DELIVERY_ZONE, 0.3);
+    deliveryGraphics.fillStyle(COLORS.DELIVERY_ZONE, 0.24);
     deliveryGraphics.fillRect(deliveryZone.x, deliveryZone.y, deliveryZone.width, deliveryZone.height);
-    deliveryGraphics.lineStyle(3, COLORS.DELIVERY_ZONE, 1);
+    deliveryGraphics.lineStyle(3, COLORS.DELIVERY_ZONE, 0.9);
     deliveryGraphics.strokeRect(deliveryZone.x, deliveryZone.y, deliveryZone.width, deliveryZone.height);
     deliveryGraphics.setDepth(1);
     
@@ -189,7 +195,7 @@ export default class GameScene extends Phaser.Scene {
       {
         fontSize: '16px',
         fontFamily: 'Arial',
-        color: '#ff0000',
+        color: '#f6d7d7',
         stroke: '#000000',
         strokeThickness: 3,
         fontStyle: 'bold'
@@ -274,7 +280,7 @@ export default class GameScene extends Phaser.Scene {
       scale: { start: 2, end: 0 },
       lifespan: 600,
       quantity: 20,
-      tint: 0x00ff00,
+      tint: 0x82c08b,
       blendMode: 'ADD'
     });
     particles.setDepth(50);
@@ -292,7 +298,7 @@ export default class GameScene extends Phaser.Scene {
       scale: { start: 1.5, end: 0 },
       lifespan: 400,
       quantity: 15,
-      tint: 0xff4500,
+      tint: 0xc97b6d,
       blendMode: 'ADD'
     });
     particles.setDepth(50);

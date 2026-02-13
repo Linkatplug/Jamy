@@ -26,7 +26,7 @@ export default class UISystem {
     this.objectiveText = this.scene.add.text(20, 20, '', {
       fontSize: '16px',
       fontFamily: 'Arial',
-      color: '#ffff00',
+      color: '#f2ebbf',
       stroke: '#000000',
       strokeThickness: 3
     }).setOrigin(0, 0).setScrollFactor(0).setDepth(100);
@@ -35,7 +35,7 @@ export default class UISystem {
     this.collisionsText = this.scene.add.text(width - 20, 20, '', {
       fontSize: '16px',
       fontFamily: 'Arial',
-      color: '#ff0000',
+      color: '#e8a1a1',
       stroke: '#000000',
       strokeThickness: 3
     }).setOrigin(1, 0).setScrollFactor(0).setDepth(100);
@@ -54,9 +54,9 @@ export default class UISystem {
     
     // Update timer color based on remaining time
     if (this.missionSystem.timeRemaining < 30) {
-      this.timerText.setColor('#ff0000');
+      this.timerText.setColor('#c97b6d');
     } else if (this.missionSystem.timeRemaining < 60) {
-      this.timerText.setColor('#ffaa00');
+      this.timerText.setColor('#d0a062');
     } else {
       this.timerText.setColor('#ffffff');
     }
@@ -76,8 +76,8 @@ export default class UISystem {
     const angle = angleBetween(truck.x, truck.y, target.x, target.y);
     
     this.arrowGraphics.clear();
-    this.arrowGraphics.lineStyle(3, 0xffff00);
-    this.arrowGraphics.fillStyle(0xffff00);
+    this.arrowGraphics.lineStyle(3, 0xe0d699);
+    this.arrowGraphics.fillStyle(0xe0d699);
     
     const arrowLength = 20;
     const arrowWidth = 10;
@@ -128,7 +128,7 @@ export default class UISystem {
     this.resumeText = this.scene.add.text(width / 2, height / 2 + 60, 'Press ESC to resume', {
       fontSize: '20px',
       fontFamily: 'Arial',
-      color: '#ffff00',
+      color: '#f2ebbf',
       stroke: '#000000',
       strokeThickness: 3
     }).setOrigin(0.5).setScrollFactor(0).setDepth(201);
