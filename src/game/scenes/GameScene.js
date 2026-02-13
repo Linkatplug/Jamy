@@ -4,6 +4,8 @@ import Trailer from '../entities/Trailer.js';
 import Obstacle from '../entities/Obstacle.js';
 import Squirrel from '../entities/Squirrel.js';
 import Pedestrian from '../entities/Pedestrian.js';
+import Building from '../entities/Building.js';
+import TrafficVehicle from '../entities/TrafficVehicle.js';
 import InputSystem from '../systems/InputSystem.js';
 import MissionSystem from '../systems/MissionSystem.js';
 import UISystem from '../systems/UISystem.js';
@@ -47,6 +49,12 @@ export default class GameScene extends Phaser.Scene {
     
     // Create obstacles with level-specific positions
     this.createObstacles();
+    
+    // Create buildings for city atmosphere
+    this.createBuildings();
+    
+    // Create traffic vehicles on roads
+    this.createTrafficVehicles();
     
     // Create truck at level-specific spawn position
     this.truck = new Truck(this, this.levelData.spawnX, this.levelData.spawnY);
@@ -222,19 +230,177 @@ export default class GameScene extends Phaser.Scene {
     });
   }
 
+  createBuildings() {
+    // Create buildings around the map edges and between roads
+    const mapWidth = this.levelData.mapWidth;
+    const mapHeight = this.levelData.mapHeight;
+    
+    const buildingTypes = ['house', 'shop', 'apartment', 'warehouse'];
+    const buildingCount = Math.floor(mapWidth / 150); // Scale with map size
+    
+    for (let i = 0; i < buildingCount; i++) {
+      const type = Phaser.Utils.Array.GetRandom(buildingTypes);
+      const width = Phaser.Math.Between(60, 100);
+      const height = Phaser.Math.Between(70, 120);
+      
+      // Place buildings in the "off-road" areas
+      // Avoid center roads and zones
+      let x, y;
+      let attempts = 0;
+      do {
+        x = Phaser.Math.Between(100, mapWidth - 100);
+        y = Phaser.Math.Between(100, mapHeight - 100);
+        attempts++;
+      } while (this.isNearRoad(x, y, mapWidth, mapHeight) && attempts < 10);
+      
+      // Don't overlap with zones
+      if (!this.overlapsZone(x, y, width, height)) {
+        new Building(this, x, y, width, height, type);
+      }
+    }
+  }
+  
+  createTrafficVehicles() {
+    this.trafficVehicles = this.physics.add.group();
+    
+    const mapWidth = this.levelData.mapWidth;
+    const mapHeight = this.levelData.mapHeight;
+    
+    // Calculate road positions
+    const horizontalRoadY = mapHeight * 0.52;
+    const verticalRoadX = mapWidth * 0.32;
+    const extraRoadX = mapWidth >= 1800 ? mapWidth * 0.7 : null;
+    
+    // Add vehicles on horizontal road
+    const horizontalCount = Math.floor(mapWidth / 300);
+    for (let i = 0; i < horizontalCount; i++) {
+      const x = (i + 0.5) * (mapWidth / horizontalCount);
+      const type = Phaser.Utils.Array.GetRandom(['car', 'sedan', 'van', 'bus']);
+      const vehicle = new TrafficVehicle(this, x, horizontalRoadY, type, 'horizontal');
+      this.trafficVehicles.add(vehicle);
+    }
+    
+    // Add vehicles on vertical road
+    const verticalCount = Math.floor(mapHeight / 250);
+    for (let i = 0; i < verticalCount; i++) {
+      const y = (i + 0.5) * (mapHeight / verticalCount);
+      const type = Phaser.Utils.Array.GetRandom(['car', 'sedan', 'van']);
+      const vehicle = new TrafficVehicle(this, verticalRoadX, y, type, 'vertical');
+      this.trafficVehicles.add(vehicle);
+    }
+    
+    // Add vehicles on extra road if it exists
+    if (extraRoadX) {
+      const extraCount = Math.floor(mapHeight / 300);
+      for (let i = 0; i < extraCount; i++) {
+        const y = (i + 0.5) * (mapHeight / extraCount);
+        const type = Phaser.Utils.Array.GetRandom(['car', 'sedan']);
+        const vehicle = new TrafficVehicle(this, extraRoadX, y, type, 'vertical');
+        this.trafficVehicles.add(vehicle);
+      }
+    }
+  }
+  
+  isNearRoad(x, y, mapWidth, mapHeight) {
+    const horizontalRoadY = mapHeight * 0.52;
+    const verticalRoadX = mapWidth * 0.32;
+    const roadMargin = 150;
+    
+    // Check if near horizontal road
+    if (Math.abs(y - horizontalRoadY) < roadMargin) {
+      return true;
+    }
+    
+    // Check if near vertical road
+    if (Math.abs(x - verticalRoadX) < roadMargin) {
+      return true;
+    }
+    
+    // Check if near extra road
+    if (mapWidth >= 1800) {
+      const extraRoadX = mapWidth * 0.7;
+      if (Math.abs(x - extraRoadX) < roadMargin) {
+        return true;
+      }
+    }
+    
+    return false;
+  }
+  
+  overlapsZone(x, y, width, height) {
+    const pickupZone = this.levelData.pickupZone;
+    const deliveryZone = this.levelData.deliveryZone;
+    const margin = 50;
+    
+    // Check pickup zone
+    if (x + width / 2 + margin > pickupZone.x - margin &&
+        x - width / 2 - margin < pickupZone.x + pickupZone.width + margin &&
+        y + height / 2 + margin > pickupZone.y - margin &&
+        y - height / 2 - margin < pickupZone.y + pickupZone.height + margin) {
+      return true;
+    }
+    
+    // Check delivery zone
+    if (x + width / 2 + margin > deliveryZone.x - margin &&
+        x - width / 2 - margin < deliveryZone.x + deliveryZone.width + margin &&
+        y + height / 2 + margin > deliveryZone.y - margin &&
+        y - height / 2 - margin < deliveryZone.y + deliveryZone.height + margin) {
+      return true;
+    }
+    
+    return false;
+  }
+
   setupCollisions() {
     // Truck collision with obstacles
     this.physics.add.collider(this.truck, this.obstaclesGroup, this.onTruckCollision, this.canTruckHitObstacles, this);
     
+    // Truck collision with traffic vehicles (Carmageddon style!)
+    this.physics.add.overlap(this.truck, this.trafficVehicles, this.onTrafficCollision, null, this);
+    
     // Trailer collision with obstacles (optional)
     if (this.trailer) {
       this.physics.add.collider(this.trailer, this.obstaclesGroup);
+      this.physics.add.overlap(this.trailer, this.trafficVehicles, this.onTrafficCollision, null, this);
     }
   }
 
 
   canTruckHitObstacles() {
     return !this.truck.isJumping;
+  }
+
+  onTrafficCollision(truck, vehicle) {
+    if (vehicle.isCrushed) return;
+    
+    const truckSpeed = Math.abs(this.truck.getSpeed());
+    
+    // Carmageddon-style vehicle carnage!
+    if (truckSpeed > 100) {
+      vehicle.crush();
+      
+      // Create explosion particles
+      this.createCollisionParticles(vehicle.x, vehicle.y);
+      
+      // Camera shake
+      this.cameraSystem.shake(200, 0.01);
+      
+      // Play collision sound
+      this.audioSystem.playCollision();
+      
+      // Add points for crushing traffic
+      if (this.missionSystem) {
+        this.missionSystem.addTrafficBonus(50);
+      }
+    } else {
+      // Light bump - just push the vehicles apart
+      const angle = Phaser.Math.Angle.Between(truck.x, truck.y, vehicle.x, vehicle.y);
+      const pushForce = 100;
+      vehicle.body.setVelocity(
+        Math.cos(angle) * pushForce,
+        Math.sin(angle) * pushForce
+      );
+    }
   }
 
   createPedestrians() {
@@ -305,7 +471,7 @@ export default class GameScene extends Phaser.Scene {
   setupEvents() {
     // Mission events
     this.events.on('cargoPickedUp', () => {
-      this.cameraSystem.flash(200, 0x00ff00);
+      this.cameraSystem.flash(100, 0x00ff00); // Reduced from 200ms to 100ms
       this.audioSystem.playPickup();
       this.createPickupParticles(this.truck.x, this.truck.y);
     });
@@ -516,6 +682,15 @@ export default class GameScene extends Phaser.Scene {
     if (this.pedestrians) {
       this.pedestrians.children.iterate((pedestrian) => {
         if (pedestrian) pedestrian.update(delta);
+      });
+    }
+    
+    // Update traffic vehicles
+    if (this.trafficVehicles) {
+      const mapWidth = this.levelData.mapWidth;
+      const mapHeight = this.levelData.mapHeight;
+      this.trafficVehicles.children.iterate((vehicle) => {
+        if (vehicle) vehicle.update(mapWidth, mapHeight);
       });
     }
     
