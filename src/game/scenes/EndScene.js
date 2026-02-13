@@ -29,7 +29,7 @@ export default class EndScene extends Phaser.Scene {
     // Mission result title
     const success = this.missionData.success;
     const titleText = success ? '🏆 MISSION SUCCESS! 🏆' : '❌ MISSION FAILED';
-    const titleColor = success ? '#00ff00' : '#ff0000';
+    const titleColor = success ? '#8bc59b' : '#c98585';
     
     const title = this.add.text(width / 2, 50, titleText, {
       fontSize: '42px',
@@ -60,7 +60,7 @@ export default class EndScene extends Phaser.Scene {
       this.add.text(width / 2, yPos, this.missionData.missionName, {
         fontSize: '24px',
         fontFamily: 'Arial',
-        color: '#ffaa00',
+        color: '#d0a062',
         stroke: '#000000',
         strokeThickness: 3
       }).setOrigin(0.5);
@@ -72,7 +72,7 @@ export default class EndScene extends Phaser.Scene {
       const scoreText = this.add.text(width / 2, yPos, `SCORE: ${this.missionData.score}`, {
         fontSize: '36px',
         fontFamily: 'Arial',
-        color: '#ffff00',
+        color: '#e6ddb7',
         stroke: '#000000',
         strokeThickness: 4
       }).setOrigin(0.5);
@@ -96,7 +96,7 @@ export default class EndScene extends Phaser.Scene {
         const qualifyText = this.add.text(width / 2, yPos, '⭐ NEW HIGH SCORE! ⭐', {
           fontSize: '22px',
           fontFamily: 'Arial',
-          color: '#FFD700',
+          color: '#d6c99a',
           fontStyle: 'bold',
           stroke: '#000000',
           strokeThickness: 3
@@ -199,7 +199,7 @@ export default class EndScene extends Phaser.Scene {
   displayStats(yPos, success, width, height) {
     // Stats section
     const statsBox = this.add.rectangle(width / 2, yPos + 60, width - 100, 130, 0x333333, 0.8);
-    statsBox.setStrokeStyle(2, success ? 0x00ff00 : 0xff0000);
+    statsBox.setStrokeStyle(2, success ? 0x6bbf7a : 0xbf6b6b);
     
     const statsY = yPos + 20;
     const lineHeight = 25;
@@ -217,6 +217,7 @@ export default class EndScene extends Phaser.Scene {
       { label: '⏱️ Time Remaining:', value: timeText, color: '#00ffff' },
       { label: '🕐 Completed in:', value: elapsedText, color: '#00ffff' },
       { label: '💥 Collisions:', value: this.missionData.collisions, color: '#ff6666' },
+      { label: '🩸 Crush Score:', value: this.missionData.crushScore || 0, color: '#ff9999' },
     ];
     
     // Perfect delivery indicator
@@ -285,7 +286,7 @@ export default class EndScene extends Phaser.Scene {
       fontSize: '24px',
       fontFamily: 'Arial',
       color: '#ffffff',
-      backgroundColor: '#006400',
+      backgroundColor: '#3e5246',
       padding: { x: 25, y: 10 },
       stroke: '#000000',
       strokeThickness: 3
@@ -295,7 +296,7 @@ export default class EndScene extends Phaser.Scene {
       fontSize: '24px',
       fontFamily: 'Arial',
       color: '#ffffff',
-      backgroundColor: '#006400',
+      backgroundColor: '#3e5246',
       padding: { x: 25, y: 10 },
       stroke: '#000000',
       strokeThickness: 3
@@ -303,7 +304,7 @@ export default class EndScene extends Phaser.Scene {
     
     // Button interactions with sound
     restartButton.on('pointerover', () => {
-      restartButton.setStyle({ backgroundColor: '#008000' });
+      restartButton.setStyle({ backgroundColor: '#4f6758' });
       this.audioSystem.playClick();
       this.tweens.add({
         targets: restartButton,
@@ -313,7 +314,7 @@ export default class EndScene extends Phaser.Scene {
     });
     
     restartButton.on('pointerout', () => {
-      restartButton.setStyle({ backgroundColor: '#006400' });
+      restartButton.setStyle({ backgroundColor: '#3e5246' });
       this.tweens.add({
         targets: restartButton,
         scale: 1,
@@ -331,7 +332,7 @@ export default class EndScene extends Phaser.Scene {
     });
     
     menuButton.on('pointerover', () => {
-      menuButton.setStyle({ backgroundColor: '#008000' });
+      menuButton.setStyle({ backgroundColor: '#4f6758' });
       this.audioSystem.playClick();
       this.tweens.add({
         targets: menuButton,
@@ -341,7 +342,7 @@ export default class EndScene extends Phaser.Scene {
     });
     
     menuButton.on('pointerout', () => {
-      menuButton.setStyle({ backgroundColor: '#006400' });
+      menuButton.setStyle({ backgroundColor: '#3e5246' });
       this.tweens.add({
         targets: menuButton,
         scale: 1,
