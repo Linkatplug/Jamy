@@ -121,9 +121,13 @@ export default class TrafficVehicle extends Phaser.Physics.Arcade.Sprite {
     graphics.lineStyle(2, 0x000000, 1);
     graphics.strokeRoundedRect(-width / 2, -height / 2, width, height, 4);
     
-    // Generate texture
-    const textureKey = `traffic_${this.vehicleType}_${this.x}_${this.y}_${Date.now()}`;
-    graphics.generateTexture(textureKey, width, height);
+    // Generate texture (use shared key to avoid memory leaks)
+    const textureKey = `traffic_${this.vehicleType}_${this.direction}_${width}x${height}`;
+    
+    // Only generate if texture doesn't exist
+    if (!this.scene.textures.exists(textureKey)) {
+      graphics.generateTexture(textureKey, width, height);
+    }
     graphics.destroy();
     
     this.setTexture(textureKey);

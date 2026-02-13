@@ -247,14 +247,18 @@ export default class GameScene extends Phaser.Scene {
       // Avoid center roads and zones
       let x, y;
       let attempts = 0;
+      let validPlacement = false;
       do {
         x = Phaser.Math.Between(100, mapWidth - 100);
         y = Phaser.Math.Between(100, mapHeight - 100);
         attempts++;
-      } while (this.isNearRoad(x, y, mapWidth, mapHeight) && attempts < 10);
+        
+        // Consider placement valid if not near road or we've tried many times
+        validPlacement = !this.isNearRoad(x, y, mapWidth, mapHeight) || attempts >= 20;
+      } while (!validPlacement && attempts < 20);
       
-      // Don't overlap with zones
-      if (!this.overlapsZone(x, y, width, height)) {
+      // Only place building if we found a valid spot and it doesn't overlap zones
+      if (validPlacement && !this.overlapsZone(x, y, width, height)) {
         new Building(this, x, y, width, height, type);
       }
     }

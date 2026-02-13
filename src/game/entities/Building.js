@@ -40,9 +40,13 @@ export default class Building extends Phaser.GameObjects.Container {
         this.drawHouse(graphics);
     }
     
-    // Generate texture and apply it
-    const textureKey = `building_${this.buildingType}_${this.x}_${this.y}`;
-    graphics.generateTexture(textureKey, this.width, this.height);
+    // Generate texture and apply it (use shared key to reduce memory usage)
+    const textureKey = `building_${this.buildingType}_${this.width}x${this.height}`;
+    
+    // Only generate if texture doesn't exist
+    if (!this.scene.textures.exists(textureKey)) {
+      graphics.generateTexture(textureKey, this.width, this.height);
+    }
     graphics.destroy();
     
     const sprite = this.scene.add.sprite(0, 0, textureKey);
