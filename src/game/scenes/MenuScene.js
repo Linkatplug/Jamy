@@ -15,15 +15,8 @@ export default class MenuScene extends Phaser.Scene {
     // Initialize audio system
     this.audioSystem = new AudioSystem(this);
     
-    // Animated background gradient
-    const bg = this.add.rectangle(width / 2, height / 2, width, height, 0x30453a);
-    this.tweens.add({
-      targets: bg,
-      fillColor: { from: 0x30453a, to: 0x3f5648 },
-      duration: 3000,
-      yoyo: true,
-      repeat: -1
-    });
+    // Static, softer background (no flashing)
+    this.add.rectangle(width / 2, height / 2, width, height, 0x30453a);
     
     // Title with shadow effect
     const titleShadow = this.add.text(width / 2 + 3, height / 2 - 97, 'JAMY', {
@@ -118,11 +111,8 @@ export default class MenuScene extends Phaser.Scene {
     
     startButton.on('pointerdown', () => {
       this.audioSystem.playPickup();
-      this.cameras.main.flash(200, 255, 255, 255);
-      this.time.delayedCall(200, () => {
-        this.audioSystem.destroy();
-        this.scene.start('LevelSelectScene');
-      });
+      this.audioSystem.destroy();
+      this.scene.start('LevelSelectScene');
     });
     
     // Leaderboard button interactions

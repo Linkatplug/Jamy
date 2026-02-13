@@ -18,6 +18,7 @@ export default class BootScene extends Phaser.Scene {
     this.load.image('truck', '/assets/sprites/truck.png');
     this.load.image('trailer', '/assets/sprites/trailer.png');
     this.load.image('tiles', '/assets/sprites/tiles.png');
+    this.load.image('squirrel', '/assets/sprites/squirrel.png');
     
     // Handle load errors - create fallback textures
     this.load.on('loaderror', (fileObj) => {
@@ -150,6 +151,37 @@ export default class BootScene extends Phaser.Scene {
       graphics.destroy();
     }
     
+
+    // Check if squirrel texture exists
+    if (!this.textures.exists('squirrel')) {
+      const graphics = this.add.graphics();
+
+      // Body
+      graphics.fillStyle(0x9b6a43, 1);
+      graphics.fillEllipse(18, 14, 18, 12);
+
+      // Tail
+      graphics.fillStyle(0xb67c4e, 1);
+      graphics.fillEllipse(10, 8, 12, 16);
+      graphics.fillStyle(0x8c5f3c, 1);
+      graphics.fillEllipse(8, 6, 8, 10);
+
+      // Head
+      graphics.fillStyle(0xa26e45, 1);
+      graphics.fillCircle(25, 10, 5);
+
+      // Ear
+      graphics.fillStyle(0x8c5f3c, 1);
+      graphics.fillTriangle(24, 4, 27, 2, 26, 6);
+
+      // Eye
+      graphics.fillStyle(0x111111, 1);
+      graphics.fillCircle(27, 9, 1);
+
+      graphics.generateTexture('squirrel', 32, 24);
+      graphics.destroy();
+    }
+
     // Check if tiles texture exists
     if (!this.textures.exists('tiles')) {
       const graphics = this.add.graphics();

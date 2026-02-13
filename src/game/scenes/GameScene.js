@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import Truck from '../entities/Truck.js';
 import Trailer from '../entities/Trailer.js';
 import Obstacle from '../entities/Obstacle.js';
+import Squirrel from '../entities/Squirrel.js';
 import InputSystem from '../systems/InputSystem.js';
 import MissionSystem from '../systems/MissionSystem.js';
 import UISystem from '../systems/UISystem.js';
@@ -71,6 +72,9 @@ export default class GameScene extends Phaser.Scene {
     
     // Create particle emitters for effects
     this.createParticleEffects();
+
+    // Decorative wildlife
+    this.createSquirrels();
   }
 
   createMap(mapWidth, mapHeight) {
@@ -308,6 +312,30 @@ export default class GameScene extends Phaser.Scene {
     });
   }
 
+  createSquirrels() {
+    const squirrelCount = Math.min(6, Math.max(3, Math.floor(this.levelData.mapWidth / 450)));
+    this.squirrels = this.physics.add.group();
+
+    for (let i = 0; i < squirrelCount; i++) {
+      const x = Phaser.Math.Between(120, this.levelData.mapWidth - 120);
+      const y = Phaser.Math.Between(120, this.levelData.mapHeight - 120);
+      const squirrel = new Squirrel(this, x, y);
+      this.squirrels.add(squirrel);
+    }
+
+    this.physics.add.collider(this.squirrels, this.obstaclesGroup);
+
+    this.physics.add.overlap(this.truck, this.squirrels, (_truck, squirrel) => {
+      squirrel.pickNewDirection(this.truck.x, this.truck.y);
+    });
+
+    if (this.trailer) {
+      this.physics.add.overlap(this.trailer, this.squirrels, (_trailer, squirrel) => {
+        squirrel.pickNewDirection(this.trailer.x, this.trailer.y);
+      });
+    }
+  }
+
   onTruckCollision(truck, obstacle) {
     this.truck.handleCollision();
     this.missionSystem.registerCollision();
@@ -350,6 +378,13 @@ export default class GameScene extends Phaser.Scene {
     if (this.trailer) {
       this.trailer.updatePosition(delta);
     }
+
+    // Update wildlife
+    if (this.squirrels) {
+      this.squirrels.children.iterate((squirrel) => {
+        if (squirrel) squirrel.update(delta);
+      });
+    }
     
     // Update mission system
     this.missionSystem.update(delta);
@@ -390,6 +425,10 @@ export default class GameScene extends Phaser.Scene {
     this.inputSystem.destroy();
     this.uiSystem.destroy();
     this.audioSystem.destroy();
+    if (this.squirrels) {
+      this.squirrels.clear(true, true);
+      this.squirrels = null;
+    }
     this.events.off('cargoPickedUp');
     this.events.off('collision');
     this.events.off('missionEnd');
