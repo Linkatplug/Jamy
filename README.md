@@ -1,8 +1,18 @@
 # JAMY Pro Skater Truckmagedon
 
+[🇫🇷 Version française / French version](README.fr.md)
+
 A top-down truck driving game in pixel art style for web browsers. Drive an American-style truck, pick up cargo, and deliver it before time runs out!
 
 ![Game Preview](docs/preview.png)
+
+## Screenshots
+
+<p align="center">
+  <img src="docs/screenshots/menu-screen.png" alt="Main Menu" width="600"/>
+  <br>
+  <em>Main Menu - Start your trucking adventure!</em>
+</p>
 
 ## ⚠️ IMPORTANT: How to Run
 
