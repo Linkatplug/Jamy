@@ -190,7 +190,8 @@ export const CONTROLS = {
   BACKWARD: ['S'],
   LEFT: ['A', 'Q'],
   RIGHT: ['D'],
-  HANDBRAKE: ['SPACE'],
+  HANDBRAKE: ['SHIFT'],
+  JUMP: ['SPACE'],
   RESET: ['R'],
   PAUSE: ['ESC']
 };

@@ -40,6 +40,14 @@ export default class UISystem {
       strokeThickness: 3
     }).setOrigin(1, 0).setScrollFactor(0).setDepth(100);
 
+    this.crushScoreText = this.scene.add.text(width - 20, 44, '', {
+      fontSize: '14px',
+      fontFamily: 'Arial',
+      color: '#ff9f9f',
+      stroke: '#000000',
+      strokeThickness: 3
+    }).setOrigin(1, 0).setScrollFactor(0).setDepth(100);
+
     // Direction arrow (bottom center) - will point to target
     this.arrowGraphics = this.scene.add.graphics();
     this.arrowGraphics.setScrollFactor(0).setDepth(100);
@@ -66,6 +74,7 @@ export default class UISystem {
 
     // Update collisions
     this.collisionsText.setText(`Collisions: ${this.missionSystem.collisions}`);
+    this.crushScoreText.setText(`Crush score: ${this.missionSystem.crushScore}`);
 
     // Update direction arrow
     this.updateDirectionArrow(truck);

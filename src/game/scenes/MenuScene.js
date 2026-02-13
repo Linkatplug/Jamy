@@ -19,15 +19,15 @@ export default class MenuScene extends Phaser.Scene {
     this.add.rectangle(width / 2, height / 2, width, height, 0x30453a);
     
     // Title with shadow effect
-    const titleShadow = this.add.text(width / 2 + 3, height / 2 - 97, 'JAMY', {
-      fontSize: '72px',
+    const titleShadow = this.add.text(width / 2 + 3, height / 2 - 97, 'JAMY Pro Skater\nTruckmagedon', {
+      fontSize: '52px',
       fontFamily: 'Arial',
       color: '#000000',
       fontStyle: 'bold'
     }).setOrigin(0.5).setAlpha(0.3);
     
-    const title = this.add.text(width / 2, height / 2 - 100, 'JAMY', {
-      fontSize: '72px',
+    const title = this.add.text(width / 2, height / 2 - 100, 'JAMY Pro Skater\nTruckmagedon', {
+      fontSize: '52px',
       fontFamily: 'Arial',
       color: '#ffffff',
       fontStyle: 'bold',
@@ -45,7 +45,7 @@ export default class MenuScene extends Phaser.Scene {
       ease: 'Sine.easeInOut'
     });
     
-    const subtitle = this.add.text(width / 2, height / 2 - 40, '🚚 Professional Truck Simulator', {
+    const subtitle = this.add.text(width / 2, height / 2 - 40, '🚚 Pro Skater Truckmagedon', {
       fontSize: '24px',
       fontFamily: 'Arial',
       color: '#e6ddb7',
@@ -181,6 +181,8 @@ export default class MenuScene extends Phaser.Scene {
       { key: 'S', action: 'Brake/Reverse' },
       { key: 'A/Q', action: 'Turn Left' },
       { key: 'D', action: 'Turn Right' },
+      { key: 'SHIFT', action: 'Handbrake' },
+      { key: 'SPACE', action: 'Jump' },
       { key: 'R', action: 'Reset' },
       { key: 'ESC', action: 'Pause' }
     ];

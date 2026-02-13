@@ -3,6 +3,7 @@ import Truck from '../entities/Truck.js';
 import Trailer from '../entities/Trailer.js';
 import Obstacle from '../entities/Obstacle.js';
 import Squirrel from '../entities/Squirrel.js';
+import Pedestrian from '../entities/Pedestrian.js';
 import InputSystem from '../systems/InputSystem.js';
 import MissionSystem from '../systems/MissionSystem.js';
 import UISystem from '../systems/UISystem.js';
@@ -74,7 +75,9 @@ export default class GameScene extends Phaser.Scene {
     this.createParticleEffects();
 
     // Decorative wildlife
+    this.bloodTrailGraphics = this.add.graphics().setDepth(2);
     this.createSquirrels();
+    this.createPedestrians();
   }
 
   createMap(mapWidth, mapHeight) {
@@ -221,12 +224,82 @@ export default class GameScene extends Phaser.Scene {
 
   setupCollisions() {
     // Truck collision with obstacles
-    this.physics.add.collider(this.truck, this.obstaclesGroup, this.onTruckCollision, null, this);
+    this.physics.add.collider(this.truck, this.obstaclesGroup, this.onTruckCollision, this.canTruckHitObstacles, this);
     
     // Trailer collision with obstacles (optional)
     if (this.trailer) {
       this.physics.add.collider(this.trailer, this.obstaclesGroup);
     }
+  }
+
+
+  canTruckHitObstacles() {
+    return !this.truck.isJumping;
+  }
+
+  createPedestrians() {
+    const palette = [0xff5cb8, 0x5ad06a, 0x55a7ff];
+    const count = Math.min(18, Math.max(9, Math.floor(this.levelData.mapWidth / 210)));
+
+    this.pedestrians = this.physics.add.group();
+
+    for (let i = 0; i < count; i++) {
+      const x = Phaser.Math.Between(120, this.levelData.mapWidth - 120);
+      const y = Phaser.Math.Between(120, this.levelData.mapHeight - 120);
+      const pedestrian = new Pedestrian(this, x, y, {
+        wheelchair: i % 5 === 0,
+        hairColor: palette[i % palette.length],
+        kind: i % 2 === 0 ? "flag" : (i % 5 === 0 ? "wheelchair" : "pedestrian")
+      });
+      this.pedestrians.add(pedestrian);
+    }
+
+    this.physics.add.collider(this.pedestrians, this.obstaclesGroup);
+
+    this.physics.add.overlap(this.truck, this.pedestrians, (_vehicle, pedestrian) => {
+      const speed = Math.abs(this.truck.getSpeed());
+      if (!pedestrian.isCrushed && speed > 120 && !this.truck.isJumping) {
+        pedestrian.isCrushed = true;
+        this.paintRedTrail(pedestrian.x, pedestrian.y);
+        this.spawnCrushChunks(pedestrian.x, pedestrian.y);
+        this.truck.addBlood(0.26);
+        this.missionSystem.registerCrush(pedestrian.kind);
+        pedestrian.destroy();
+      } else {
+        pedestrian.pickNewDirection(this.truck.x, this.truck.y);
+        this.createAlertParticles(pedestrian.x, pedestrian.y);
+      }
+    });
+
+    if (this.trailer) {
+      this.physics.add.overlap(this.trailer, this.pedestrians, (_trailer, pedestrian) => {
+        const speed = Math.abs(this.truck.getSpeed());
+        if (!pedestrian.isCrushed && speed > 115 && !this.truck.isJumping) {
+          pedestrian.isCrushed = true;
+          this.paintRedTrail(pedestrian.x, pedestrian.y);
+          this.spawnCrushChunks(pedestrian.x, pedestrian.y);
+          this.truck.addBlood(0.2);
+          this.missionSystem.registerCrush(pedestrian.kind);
+          pedestrian.destroy();
+        } else {
+          pedestrian.pickNewDirection(this.trailer.x, this.trailer.y);
+          this.createAlertParticles(pedestrian.x, pedestrian.y);
+        }
+      });
+    }
+  }
+
+  createAlertParticles(x, y) {
+    const particles = this.add.particles(x, y, 'pixel', {
+      speed: { min: 40, max: 90 },
+      angle: { min: 0, max: 360 },
+      scale: { start: 1.2, end: 0 },
+      lifespan: 380,
+      quantity: 10,
+      tint: 0xf2cf5b
+    });
+
+    this.time.delayedCall(420, () => particles.destroy());
   }
 
   setupEvents() {
@@ -313,7 +386,7 @@ export default class GameScene extends Phaser.Scene {
   }
 
   createSquirrels() {
-    const squirrelCount = Math.min(6, Math.max(3, Math.floor(this.levelData.mapWidth / 450)));
+    const squirrelCount = Math.min(16, Math.max(8, Math.floor(this.levelData.mapWidth / 230)));
     this.squirrels = this.physics.add.group();
 
     for (let i = 0; i < squirrelCount; i++) {
@@ -326,14 +399,68 @@ export default class GameScene extends Phaser.Scene {
     this.physics.add.collider(this.squirrels, this.obstaclesGroup);
 
     this.physics.add.overlap(this.truck, this.squirrels, (_truck, squirrel) => {
-      squirrel.pickNewDirection(this.truck.x, this.truck.y);
+      const speed = Math.abs(this.truck.getSpeed());
+      if (!squirrel.isCrushed && speed > 140 && !this.truck.isJumping) {
+        squirrel.isCrushed = true;
+        this.paintRedTrail(squirrel.x, squirrel.y);
+        this.spawnCrushChunks(squirrel.x, squirrel.y);
+        this.truck.addBlood(0.1);
+        this.missionSystem.registerCrush('squirrel');
+        squirrel.destroy();
+      } else {
+        squirrel.pickNewDirection(this.truck.x, this.truck.y);
+      }
     });
 
     if (this.trailer) {
       this.physics.add.overlap(this.trailer, this.squirrels, (_trailer, squirrel) => {
-        squirrel.pickNewDirection(this.trailer.x, this.trailer.y);
+        const speed = Math.abs(this.truck.getSpeed());
+        if (!squirrel.isCrushed && speed > 130 && !this.truck.isJumping) {
+          squirrel.isCrushed = true;
+          this.paintRedTrail(squirrel.x, squirrel.y);
+          this.spawnCrushChunks(squirrel.x, squirrel.y);
+          this.truck.addBlood(0.08);
+          this.missionSystem.registerCrush('squirrel');
+          squirrel.destroy();
+        } else {
+          squirrel.pickNewDirection(this.trailer.x, this.trailer.y);
+        }
       });
     }
+  }
+
+  spawnCrushChunks(x, y) {
+    if (!this.crushChunks) {
+      this.crushChunks = [];
+    }
+
+    for (let i = 0; i < 6; i++) {
+      const chunk = this.add.rectangle(
+        x + Phaser.Math.Between(-10, 10),
+        y + Phaser.Math.Between(-10, 10),
+        Phaser.Math.Between(3, 7),
+        Phaser.Math.Between(2, 6),
+        0x7f1414,
+        0.8
+      ).setDepth(2);
+
+      this.crushChunks.push(chunk);
+      if (this.crushChunks.length > 280) {
+        const old = this.crushChunks.shift();
+        old.destroy();
+      }
+    }
+  }
+
+  paintRedTrail(x, y) {
+    if (!this.bloodTrailGraphics) return;
+
+    this.bloodTrailGraphics.lineStyle(6, 0xa01717, 0.82);
+    const angle = this.truck.rotation + Phaser.Math.FloatBetween(-0.18, 0.18);
+    const len = Phaser.Math.Between(72, 136);
+    this.bloodTrailGraphics.strokeLineShape(
+      new Phaser.Geom.Line(x, y, x - Math.cos(angle) * len, y - Math.sin(angle) * len)
+    );
   }
 
   onTruckCollision(truck, obstacle) {
@@ -385,6 +512,12 @@ export default class GameScene extends Phaser.Scene {
         if (squirrel) squirrel.update(delta);
       });
     }
+
+    if (this.pedestrians) {
+      this.pedestrians.children.iterate((pedestrian) => {
+        if (pedestrian) pedestrian.update(delta);
+      });
+    }
     
     // Update mission system
     this.missionSystem.update(delta);
@@ -429,8 +562,20 @@ export default class GameScene extends Phaser.Scene {
       this.squirrels.clear(true, true);
       this.squirrels = null;
     }
+    if (this.pedestrians) {
+      this.pedestrians.clear(true, true);
+      this.pedestrians = null;
+    }
     this.events.off('cargoPickedUp');
     this.events.off('collision');
     this.events.off('missionEnd');
+    if (this.bloodTrailGraphics) {
+      this.bloodTrailGraphics.destroy();
+      this.bloodTrailGraphics = null;
+    }
+    if (this.crushChunks) {
+      this.crushChunks.forEach((chunk) => chunk.destroy());
+      this.crushChunks = null;
+    }
   }
 }

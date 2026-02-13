@@ -217,6 +217,7 @@ export default class EndScene extends Phaser.Scene {
       { label: '⏱️ Time Remaining:', value: timeText, color: '#00ffff' },
       { label: '🕐 Completed in:', value: elapsedText, color: '#00ffff' },
       { label: '💥 Collisions:', value: this.missionData.collisions, color: '#ff6666' },
+      { label: '🩸 Crush Score:', value: this.missionData.crushScore || 0, color: '#ff9999' },
     ];
     
     // Perfect delivery indicator

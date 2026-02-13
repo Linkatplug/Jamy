@@ -3,7 +3,7 @@ import { TRAILER_FOLLOW_SMOOTHNESS, TRAILER_MAX_ANGLE } from '../utils/constants
 import { lerp, angleDifference, degToRad, normalizeAngle } from '../utils/math.js';
 
 /**
- * Trailer - Follows truck with stable hitch alignment
+ * Trailer - Follows truck with stable hitch alignment and jump flip effect
  */
 export default class Trailer extends Phaser.Physics.Arcade.Sprite {
   constructor(scene, truck) {
@@ -19,8 +19,9 @@ export default class Trailer extends Phaser.Physics.Arcade.Sprite {
     this.setCollideWorldBounds(true);
     this.setDepth(9);
 
-    // Most trailer sprites are drawn vertically, compensate once.
     this.textureAngleOffset = -Math.PI / 2;
+    this.flipSpinRemaining = 0;
+    this.wasTruckJumping = false;
 
     this.updatePosition(16);
   }
@@ -31,26 +32,41 @@ export default class Trailer extends Phaser.Physics.Arcade.Sprite {
     const deltaSeconds = Math.max(delta / 1000, 0.016);
     const smoothness = Math.min(TRAILER_FOLLOW_SMOOTHNESS + deltaSeconds * 0.45, 0.2);
 
-    // Hitch point right behind truck
     const hitchX = this.truck.x - Math.cos(this.truck.rotation) * this.hitchOffset;
     const hitchY = this.truck.y - Math.sin(this.truck.rotation) * this.hitchOffset;
 
-    // Keep trailer center behind hitch along truck direction to avoid detaching
     const targetX = hitchX - Math.cos(this.truck.rotation) * this.connectionDistance;
     const targetY = hitchY - Math.sin(this.truck.rotation) * this.connectionDistance;
 
     this.x = lerp(this.x, targetX, smoothness);
     this.y = lerp(this.y, targetY, smoothness);
 
-    // Trailer nose should face hitch point
     const hitchAngle = Math.atan2(hitchY - this.y, hitchX - this.x);
 
-    // Clamp articulation angle vs truck
     let articulation = angleDifference(this.truck.rotation * 180 / Math.PI, hitchAngle * 180 / Math.PI);
     articulation = Math.max(-TRAILER_MAX_ANGLE, Math.min(TRAILER_MAX_ANGLE, articulation));
 
+    if (this.truck.isJumping && !this.wasTruckJumping) {
+      this.flipSpinRemaining = Math.PI * 5.2;
+      this.setDepth(13);
+      this.setScale(1.24);
+    }
+    this.wasTruckJumping = this.truck.isJumping;
+
     const desiredAngle = this.truck.rotation + degToRad(articulation);
-    this.rotation = lerp(this.rotation, desiredAngle + this.textureAngleOffset, smoothness * 1.5);
+
+    if (this.flipSpinRemaining > 0) {
+      const spinStep = Math.min(this.flipSpinRemaining, Math.PI * 9.5 * deltaSeconds);
+      this.flipSpinRemaining -= spinStep;
+      this.rotation += spinStep;
+    }
+
+    this.rotation = lerp(this.rotation, desiredAngle + this.textureAngleOffset, smoothness * 1.15);
+
+    if (this.flipSpinRemaining <= 0) {
+      this.setDepth(9);
+      this.setScale(1);
+    }
 
     const rotDeg = normalizeAngle(this.rotation * 180 / Math.PI);
     this.rotation = rotDeg * Math.PI / 180;
@@ -59,5 +75,7 @@ export default class Trailer extends Phaser.Physics.Arcade.Sprite {
   reset(x, y, rotation) {
     this.setPosition(x, y);
     this.setRotation(rotation + this.textureAngleOffset);
+    this.flipSpinRemaining = 0;
+    this.wasTruckJumping = false;
   }
 }
