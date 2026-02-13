@@ -1,76 +1,312 @@
-# Jamy 🚚
+# JAMY - Truck Driving Game
 
-Jeu de conduite de camion vue du dessus en pixel art (navigateur web)
+A top-down truck driving game in pixel art style for web browsers. Drive an American-style truck, pick up cargo, and deliver it before time runs out!
 
-## Description
+![Game Preview](docs/preview.png)
 
-Jamy est un jeu HTML5 top-down de conduite de camion avec un style pixel art. Le jeu utilise Phaser 3 pour le moteur de jeu et Vite pour le bundling et le développement.
+## ⚠️ IMPORTANT: How to Run
 
-## Technologies
+**DO NOT open `index.html` directly in your browser!** This will result in a white screen and CORS errors.
 
-- **JavaScript** - Langage de programmation
-- **Phaser 3** - Moteur de jeu HTML5
-- **Vite** - Build tool et dev server
+This game uses modern JavaScript modules that require a web server. You MUST use one of these methods:
 
-## Caractéristiques
-
-- ✨ Canvas pixel-perfect avec rendu low-res upscalé (320x240 -> 960x720)
-- 🎮 Phaser 3 configuré pour les jeux pixel art
-- ⚡ Hot Module Replacement avec Vite
-- 📦 Build optimisé pour la production
-
-## Structure du projet
-
-```
-jamy/
-├── src/
-│   ├── main.js           # Point d'entrée du jeu
-│   └── scenes/
-│       └── BootScene.js  # Scène de démarrage
-├── index.html            # Page HTML principale
-├── vite.config.js        # Configuration Vite
-├── package.json          # Dépendances et scripts
-└── README.md            # Ce fichier
-```
-
-## Installation
-
+### Method 1: Development Server (Recommended)
 ```bash
 npm install
+npm run gen-assets
+npm run dev
+```
+The game will open automatically at `http://localhost:3000`
+
+### Method 2: Production Build
+```bash
+npm install
+npm run gen-assets
+npm run build
+npm run preview
 ```
 
-## Développement
+## Features
 
-Pour lancer le serveur de développement :
+- 🚚 Top-down arcade truck driving physics
+- 🎮 Keyboard controls only
+- 🎨 Pixel art graphics with nearest neighbor rendering
+- 📦 Mission-based gameplay: pickup and delivery
+- ⏱️ Time-based scoring system
+- 🎯 Direction arrow pointing to objectives
+- 🚧 Obstacles and collision detection
+- 🎪 Trailer mechanics (fake pivot system)
+
+## Quick Start
+
+### Installation
 
 ```bash
+# Clone the repository
+git clone https://github.com/Linkatplug/Jamy.git
+cd Jamy
+
+# Install dependencies
+npm install
+
+# Generate game assets (sprites)
+npm run gen-assets
+
+# Start development server
 npm run dev
 ```
 
-Le jeu sera accessible sur `http://localhost:3000` et se rechargera automatiquement à chaque modification.
+The game will automatically open in your browser at `http://localhost:3000`.
 
-## Build
+### Build for Production
 
-Pour créer une version de production :
+```bash
+# Create production build
+npm run build
 
+# Preview production build
+npm run preview
+```
+
+The build output will be in the `dist/` directory.
+
+## Controls
+
+| Key | Action |
+|-----|--------|
+| **W** or **Z** | Accelerate forward |
+| **S** | Brake / Reverse |
+| **A** or **Q** | Turn left |
+| **D** | Turn right |
+| **SPACE** | Handbrake (emergency brake) |
+| **R** | Reset truck position |
+| **ESC** | Pause / Resume game |
+
+## Gameplay
+
+### Objective
+Pick up cargo from the green zone and deliver it to the red zone before time runs out!
+
+### Scoring
+- **Time Bonus**: Faster deliveries earn more points (10 points per second remaining)
+- **Collision Penalty**: Each collision deducts 50 points
+- **Final Score**: Time Bonus - Collision Penalties
+
+### Tips
+- Use the direction arrow at the bottom of the screen to find your target
+- Avoid obstacles to maximize your score
+- The truck turns better at higher speeds
+- Use handbrake for tight turns
+- Watch your collision counter!
+
+## Project Structure
+
+```
+Jamy/
+├── public/
+│   └── assets/
+│       └── sprites/          # Generated sprite assets
+│           ├── truck.png
+│           ├── trailer.png
+│           └── tiles.png
+├── src/
+│   ├── main.js              # Game bootstrap
+│   ├── styles/
+│   │   └── style.css        # Game styling
+│   └── game/
+│       ├── config.js        # Phaser configuration
+│       ├── scenes/          # Game scenes
+│       │   ├── BootScene.js     # Asset loading
+│       │   ├── MenuScene.js     # Main menu
+│       │   ├── GameScene.js     # Main gameplay
+│       │   └── EndScene.js      # Results screen
+│       ├── entities/        # Game entities
+│       │   ├── Truck.js         # Player truck
+│       │   ├── Trailer.js       # Trailer mechanics
+│       │   └── Obstacle.js      # Static obstacles
+│       ├── systems/         # Game systems
+│       │   ├── InputSystem.js   # Keyboard input
+│       │   ├── MissionSystem.js # Mission logic
+│       │   ├── UISystem.js      # HUD display
+│       │   ├── CameraSystem.js  # Camera follow
+│       │   └── AudioSystem.js   # Audio (placeholder)
+│       └── utils/           # Utilities
+│           ├── constants.js     # Game constants
+│           └── math.js          # Math helpers
+├── scripts/
+│   └── gen-assets.js        # Asset generation script
+├── docs/
+│   └── architecture.md      # Architecture documentation
+├── package.json
+├── vite.config.js
+└── README.md
+```
+
+## Customization
+
+### Adding Your Own Sprites
+
+The game uses auto-generated placeholder sprites by default. To use your own:
+
+1. **Truck sprite**: Replace `public/assets/sprites/truck.png` with your own 32x32 pixel art truck
+2. **Trailer sprite**: Replace `public/assets/sprites/trailer.png` with your own 16x48 pixel art trailer
+3. **Tiles**: Replace `public/assets/sprites/tiles.png` with your own tileset
+
+**Important**: Maintain the same dimensions for proper game rendering:
+- Truck: 32x32 pixels
+- Trailer: 16x48 pixels
+- Tiles: Any size (currently 128x64 for 4x2 tiles)
+
+### Modifying Game Constants
+
+Edit `src/game/utils/constants.js` to adjust:
+- Truck physics (acceleration, max speed, turn rate)
+- Mission time limit
+- Scoring parameters
+- Map dimensions
+- Zone positions
+
+### Adding New Obstacles
+
+In `src/game/scenes/GameScene.js`, add positions to the `obstaclePositions` array in the `createObstacles()` method.
+
+## Deployment
+
+### GitHub Pages
+
+1. Update `vite.config.js` base path if needed:
+```javascript
+export default defineConfig({
+  base: '/Jamy/', // Replace with your repo name
+  // ...
+});
+```
+
+2. Build the project:
 ```bash
 npm run build
 ```
 
-Les fichiers optimisés seront générés dans le dossier `dist/`.
-
-## Preview
-
-Pour prévisualiser le build de production :
-
+3. Deploy the `dist/` folder to GitHub Pages:
 ```bash
-npm run preview
+# Using gh-pages package
+npm install -g gh-pages
+gh-pages -d dist
 ```
 
-## Licence
+4. Enable GitHub Pages in repository settings pointing to the `gh-pages` branch
 
-MIT - Voir le fichier [LICENSE](LICENSE) pour plus de détails.
+### Other Hosting
 
-## Auteur
+Simply upload the contents of the `dist/` folder to any static hosting service:
+- Netlify
+- Vercel
+- AWS S3
+- Firebase Hosting
+- etc.
 
-LinkAtPlug
+## Technology Stack
+
+- **Game Engine**: [Phaser 3](https://phaser.io/) - HTML5 game framework
+- **Build Tool**: [Vite](https://vitejs.dev/) - Fast build tool and dev server
+- **Language**: JavaScript (ES Modules)
+- **Asset Generation**: Node.js Canvas API
+
+## Development
+
+### NPM Scripts
+
+- `npm run dev` - Start development server with hot reload
+- `npm run build` - Create production build
+- `npm run preview` - Preview production build locally
+- `npm run gen-assets` - Generate placeholder sprite assets
+
+### Adding Features
+
+See [docs/architecture.md](docs/architecture.md) for detailed information about the game architecture and how to extend it.
+
+## Browser Support
+
+The game works in all modern browsers that support:
+- ES6 Modules
+- Canvas API
+- WebGL (for Phaser 3)
+
+Tested on:
+- Chrome 90+
+- Firefox 88+
+- Safari 14+
+- Edge 90+
+
+## Troubleshooting
+
+### White Screen / CORS Error
+
+**Problem**: Opening `index.html` directly shows a white screen or CORS error:
+```
+Cross-Origin Request blocked: The Same Origin Policy disallows reading the remote resource at file:///src/main.js
+```
+
+**Solution**: You cannot open the HTML file directly. Use the development server:
+```bash
+npm run dev
+```
+
+**Why**: Modern browsers block ES6 module imports from `file://` protocol for security reasons. The game requires an HTTP server to run.
+
+### Game Won't Start After npm run dev
+
+**Problem**: The browser opens but shows an error.
+
+**Solutions**:
+1. Make sure you ran `npm install` first
+2. Generate assets: `npm run gen-assets`
+3. Check that port 3000 is not already in use
+4. Try clearing your browser cache (Ctrl+Shift+Delete)
+
+### Assets Not Loading
+
+**Problem**: Sprites or images don't appear.
+
+**Solution**: Run the asset generation script:
+```bash
+npm run gen-assets
+```
+
+The game includes fallback texture generation, so it should work even without the sprite files.
+
+### Node.js Not Installed
+
+**Problem**: Commands don't work or show "command not found".
+
+**Solution**: Install Node.js from [nodejs.org](https://nodejs.org) (LTS version recommended).
+
+## License
+
+MIT License - see LICENSE file for details
+
+## Credits
+
+Created as a pixel art truck driving game demonstration using Phaser 3.
+
+## Support
+
+For issues, questions, or contributions, please visit the [GitHub repository](https://github.com/Linkatplug/Jamy).
+
+## Roadmap
+
+Potential future enhancements:
+- [ ] Multiple missions with increasing difficulty
+- [ ] Different truck types
+- [ ] Weather effects
+- [ ] Day/night cycle
+- [ ] More detailed maps
+- [ ] Multiplayer mode
+- [ ] Mobile touch controls
+- [ ] Sound effects and music
+- [ ] Achievements system
+- [ ] Leaderboards
+
+---
+
+**Enjoy the game! 🚚💨**

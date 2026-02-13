@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>File Protocol Error Demo</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', sans-serif;
+      background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+    .error-content {
+      background: white;
+      padding: 40px;
+      border-radius: 10px;
+      max-width: 600px;
+      box-shadow: 0 10px 50px rgba(0, 0, 0, 0.5);
+    }
+    .error-content h1 {
+      color: #dc3545;
+      margin-top: 0;
+    }
+    .error-content code {
+      background: #f5f5f5;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-family: monospace;
+    }
+    .error-content .command-box {
+      background: #2d2d2d;
+      color: #00ff00;
+      padding: 15px;
+      border-radius: 5px;
+      margin: 15px 0;
+      font-family: monospace;
+      overflow-x: auto;
+    }
+    .error-content ol {
+      padding-left: 20px;
+    }
+    .error-content li {
+      margin: 10px 0;
+    }
+    .protocol-info {
+      background: #e3f2fd;
+      padding: 10px;
+      border-radius: 5px;
+      margin: 15px 0;
+      border-left: 4px solid #2196f3;
+    }
+  </style>
+</head>
+<body>
+  <div class="error-content">
+    <h1>⚠️ Cannot Open Directly</h1>
+    <p><strong>You cannot open this game by double-clicking index.html!</strong></p>
+    
+    <div class="protocol-info">
+      <strong>Current Protocol:</strong> <code id="protocol">Loading...</code>
+    </div>
+    
+    <p>This game uses modern ES6 modules which require an HTTP server. Opening the file directly (using <code>file://</code> protocol) is blocked by browsers for security reasons.</p>
+    
+    <h2>✅ How to Play:</h2>
+    <ol>
+      <li>Open a terminal/command prompt in this folder</li>
+      <li>Run these commands:</li>
+    </ol>
+    <div class="command-box">
+npm install<br>
+npm run gen-assets<br>
+npm run dev
+    </div>
+    <p><strong>The game will automatically open in your browser at <code>http://localhost:3000</code></strong></p>
+    
+    <h2>📦 Alternative: Use the Built Version</h2>
+    <p>Or build the game first, then open the built version:</p>
+    <div class="command-box">
+npm run build<br>
+npm run preview
+    </div>
+    
+    <p style="margin-top: 20px; padding: 10px; background: #fff3cd; border-radius: 5px;">
+      <strong>💡 Tip:</strong> If you don't have Node.js installed, download it from <a href="https://nodejs.org" target="_blank">nodejs.org</a>
+    </p>
+  </div>
+  
+  <script>
+    // Display the current protocol
+    document.getElementById('protocol').textContent = window.location.protocol;
+    
+    // Add warning styling if file:// protocol
+    if (window.location.protocol === 'file:') {
+      document.getElementById('protocol').style.color = '#dc3545';
+      document.getElementById('protocol').style.fontWeight = 'bold';
+    } else {
+      document.getElementById('protocol').style.color = '#28a745';
+    }
+  </script>
+</body>
+</html>

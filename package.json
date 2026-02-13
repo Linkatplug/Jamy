@@ -1,12 +1,13 @@
 {
-  "name": "jamy",
+  "name": "jamy-truck-game",
   "version": "1.0.0",
-  "description": "Jeu de conduite de camion vue du dessus en pixel art",
+  "description": "Top-down truck driving game in pixel art for browser",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "gen-assets": "node scripts/gen-assets.js"
   },
   "keywords": [
     "game",
@@ -22,6 +23,7 @@
     "phaser": "^3.80.1"
   },
   "devDependencies": {
+    "pngjs": "^7.0.0",
     "vite": "^5.0.12"
   }
 }
