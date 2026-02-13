@@ -9,6 +9,8 @@ export default class BootScene extends Phaser.Scene {
   }
 
   preload() {
+    this.failedAssetKeys = new Set();
+
     // Create loading bar
     this.createLoadingBar();
     
@@ -19,6 +21,7 @@ export default class BootScene extends Phaser.Scene {
     
     // Handle load errors - create fallback textures
     this.load.on('loaderror', (fileObj) => {
+      this.failedAssetKeys.add(fileObj.key);
       console.warn(`Failed to load ${fileObj.key}, will create fallback`);
     });
     
@@ -87,6 +90,14 @@ export default class BootScene extends Phaser.Scene {
   }
 
   createFallbackTextures() {
+    // If Phaser registered a broken texture after a decode/load error,
+    // remove it so we can recreate a valid fallback texture.
+    this.failedAssetKeys.forEach((assetKey) => {
+      if (this.textures.exists(assetKey)) {
+        this.textures.remove(assetKey);
+      }
+    });
+
     // Create pixel texture for particles
     if (!this.textures.exists('pixel')) {
       const graphics = this.add.graphics();
