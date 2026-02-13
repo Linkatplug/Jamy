@@ -15,15 +15,8 @@ export default class MenuScene extends Phaser.Scene {
     // Initialize audio system
     this.audioSystem = new AudioSystem(this);
     
-    // Animated background gradient
-    const bg = this.add.rectangle(width / 2, height / 2, width, height, 0x228B22);
-    this.tweens.add({
-      targets: bg,
-      fillColor: { from: 0x228B22, to: 0x2A9D2F },
-      duration: 3000,
-      yoyo: true,
-      repeat: -1
-    });
+    // Static, softer background (no flashing)
+    this.add.rectangle(width / 2, height / 2, width, height, 0x30453a);
     
     // Title with shadow effect
     const titleShadow = this.add.text(width / 2 + 3, height / 2 - 97, 'JAMY', {
@@ -38,7 +31,7 @@ export default class MenuScene extends Phaser.Scene {
       fontFamily: 'Arial',
       color: '#ffffff',
       fontStyle: 'bold',
-      stroke: '#FFD700',
+      stroke: '#d6c99a',
       strokeThickness: 6
     }).setOrigin(0.5);
     
@@ -55,7 +48,7 @@ export default class MenuScene extends Phaser.Scene {
     const subtitle = this.add.text(width / 2, height / 2 - 40, '🚚 Professional Truck Simulator', {
       fontSize: '24px',
       fontFamily: 'Arial',
-      color: '#ffff00',
+      color: '#e6ddb7',
       stroke: '#000000',
       strokeThickness: 4
     }).setOrigin(0.5);
@@ -70,14 +63,14 @@ export default class MenuScene extends Phaser.Scene {
     });
     
     // Enhanced start button with glow effect
-    const startButtonGlow = this.add.rectangle(width / 2, height / 2 + 40, 200, 60, 0x00ff00, 0.3);
+    const startButtonGlow = this.add.rectangle(width / 2, height / 2 + 40, 200, 60, 0x6bbf7a, 0.3);
     startButtonGlow.setVisible(false);
     
     const startButton = this.add.text(width / 2, height / 2 + 40, '▶ START', {
       fontSize: '36px',
       fontFamily: 'Arial',
       color: '#ffffff',
-      backgroundColor: '#006400',
+      backgroundColor: '#3e5246',
       padding: { x: 40, y: 15 },
       stroke: '#000000',
       strokeThickness: 4
@@ -88,7 +81,7 @@ export default class MenuScene extends Phaser.Scene {
       fontSize: '28px',
       fontFamily: 'Arial',
       color: '#ffffff',
-      backgroundColor: '#1e3a5f',
+      backgroundColor: '#394b59',
       padding: { x: 30, y: 12 },
       stroke: '#000000',
       strokeThickness: 3
@@ -96,7 +89,7 @@ export default class MenuScene extends Phaser.Scene {
     
     // Button hover effects with sound
     startButton.on('pointerover', () => {
-      startButton.setStyle({ backgroundColor: '#008000', scale: 1.1 });
+      startButton.setStyle({ backgroundColor: '#4f6758', scale: 1.1 });
       startButtonGlow.setVisible(true);
       this.audioSystem.playClick();
       this.tweens.add({
@@ -107,7 +100,7 @@ export default class MenuScene extends Phaser.Scene {
     });
     
     startButton.on('pointerout', () => {
-      startButton.setStyle({ backgroundColor: '#006400' });
+      startButton.setStyle({ backgroundColor: '#3e5246' });
       startButtonGlow.setVisible(false);
       this.tweens.add({
         targets: startButton,
@@ -118,16 +111,13 @@ export default class MenuScene extends Phaser.Scene {
     
     startButton.on('pointerdown', () => {
       this.audioSystem.playPickup();
-      this.cameras.main.flash(200, 255, 255, 255);
-      this.time.delayedCall(200, () => {
-        this.audioSystem.destroy();
-        this.scene.start('LevelSelectScene');
-      });
+      this.audioSystem.destroy();
+      this.scene.start('LevelSelectScene');
     });
     
     // Leaderboard button interactions
     leaderboardButton.on('pointerover', () => {
-      leaderboardButton.setStyle({ backgroundColor: '#2e4a6f' });
+      leaderboardButton.setStyle({ backgroundColor: '#4c6172' });
       this.audioSystem.playClick();
       this.tweens.add({
         targets: leaderboardButton,
@@ -137,7 +127,7 @@ export default class MenuScene extends Phaser.Scene {
     });
     
     leaderboardButton.on('pointerout', () => {
-      leaderboardButton.setStyle({ backgroundColor: '#1e3a5f' });
+      leaderboardButton.setStyle({ backgroundColor: '#394b59' });
       this.tweens.add({
         targets: leaderboardButton,
         scale: 1,
@@ -202,7 +192,7 @@ export default class MenuScene extends Phaser.Scene {
       this.add.text(width / 2 - 80, y, control.key, {
         fontSize: '14px',
         fontFamily: 'Arial',
-        color: '#FFD700',
+        color: '#d6c99a',
         fontStyle: 'bold',
         backgroundColor: '#333333',
         padding: { x: 6, y: 2 }
@@ -227,7 +217,7 @@ export default class MenuScene extends Phaser.Scene {
       '🎯 MISSION: Pick up cargo and deliver before time runs out!', {
       fontSize: '16px',
       fontFamily: 'Arial',
-      color: '#ffff00',
+      color: '#e6ddb7',
       stroke: '#000000',
       strokeThickness: 3,
       backgroundColor: '#00000066',
