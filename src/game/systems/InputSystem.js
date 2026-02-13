@@ -19,6 +19,7 @@ export default class InputSystem {
     this.keys.left = CONTROLS.LEFT.map(key => keyboard.addKey(key));
     this.keys.right = CONTROLS.RIGHT.map(key => keyboard.addKey(key));
     this.keys.handbrake = CONTROLS.HANDBRAKE.map(key => keyboard.addKey(key));
+    this.keys.jump = CONTROLS.JUMP.map(key => keyboard.addKey(key));
     this.keys.reset = CONTROLS.RESET.map(key => keyboard.addKey(key));
     this.keys.pause = CONTROLS.PAUSE.map(key => keyboard.addKey(key));
   }
@@ -38,6 +39,7 @@ export default class InputSystem {
       left: this.isPressed('left'),
       right: this.isPressed('right'),
       handbrake: this.isPressed('handbrake'),
+      jump: this.isJustPressed('jump'),
       reset: this.isJustPressed('reset'),
       pause: this.isJustPressed('pause')
     };

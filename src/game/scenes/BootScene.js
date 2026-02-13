@@ -18,6 +18,9 @@ export default class BootScene extends Phaser.Scene {
     this.load.image('truck', '/assets/sprites/truck.png');
     this.load.image('trailer', '/assets/sprites/trailer.png');
     this.load.image('tiles', '/assets/sprites/tiles.png');
+    this.load.image('squirrel', '/assets/sprites/squirrel.png');
+    this.load.image('pedestrian', '/assets/sprites/pedestrian.png');
+    this.load.image('pedestrian_wheelchair', '/assets/sprites/pedestrian_wheelchair.png');
     
     // Handle load errors - create fallback textures
     this.load.on('loaderror', (fileObj) => {
@@ -37,14 +40,14 @@ export default class BootScene extends Phaser.Scene {
     this.add.rectangle(width / 2, height / 2, width, height, 0x222222);
     
     // Title
-    this.add.text(width / 2, height / 2 - 100, 'JAMY', {
-      fontSize: '64px',
+    this.add.text(width / 2, height / 2 - 100, 'JAMY Pro Skater\nTruckmagedon', {
+      fontSize: '48px',
       fontFamily: 'Arial',
       color: '#ffffff',
       fontStyle: 'bold'
     }).setOrigin(0.5);
     
-    this.add.text(width / 2, height / 2 - 50, 'Truck Driving Game', {
+    this.add.text(width / 2, height / 2 - 50, 'Pro Skater Truckmagedon', {
       fontSize: '24px',
       fontFamily: 'Arial',
       color: '#aaaaaa'
@@ -150,6 +153,91 @@ export default class BootScene extends Phaser.Scene {
       graphics.destroy();
     }
     
+
+    // Check if squirrel texture exists
+    if (!this.textures.exists('squirrel')) {
+      const graphics = this.add.graphics();
+
+      // Body
+      graphics.fillStyle(0x9b6a43, 1);
+      graphics.fillEllipse(18, 14, 18, 12);
+
+      // Tail
+      graphics.fillStyle(0xb67c4e, 1);
+      graphics.fillEllipse(10, 8, 12, 16);
+      graphics.fillStyle(0x8c5f3c, 1);
+      graphics.fillEllipse(8, 6, 8, 10);
+
+      // Head
+      graphics.fillStyle(0xa26e45, 1);
+      graphics.fillCircle(25, 10, 5);
+
+      // Ear
+      graphics.fillStyle(0x8c5f3c, 1);
+      graphics.fillTriangle(24, 4, 27, 2, 26, 6);
+
+      // Eye
+      graphics.fillStyle(0x111111, 1);
+      graphics.fillCircle(27, 9, 1);
+
+      graphics.generateTexture('squirrel', 32, 24);
+      graphics.destroy();
+    }
+
+
+    // Check if pedestrian texture exists
+    if (!this.textures.exists('pedestrian')) {
+      const graphics = this.add.graphics();
+
+      // Body
+      graphics.fillStyle(0x2f4f6f, 1);
+      graphics.fillRect(12, 12, 8, 12);
+
+      // Head
+      graphics.fillStyle(0xf0c7a1, 1);
+      graphics.fillCircle(16, 8, 4);
+
+      // Rainbow flag
+      const stripes = [0xff3b30, 0xff9500, 0xffd60a, 0x34c759, 0x007aff, 0xaf52de];
+      stripes.forEach((c, i) => {
+        graphics.fillStyle(c, 1);
+        graphics.fillRect(20, 10 + i, 8, 1);
+      });
+      graphics.lineStyle(1, 0x222222, 1);
+      graphics.strokeLineShape(new Phaser.Geom.Line(20, 8, 20, 18));
+
+      graphics.generateTexture('pedestrian', 32, 32);
+      graphics.destroy();
+    }
+
+    if (!this.textures.exists('pedestrian_wheelchair')) {
+      const graphics = this.add.graphics();
+
+      // Body and head
+      graphics.fillStyle(0x444f8a, 1);
+      graphics.fillRect(12, 12, 8, 10);
+      graphics.fillStyle(0xf0c7a1, 1);
+      graphics.fillCircle(16, 8, 4);
+
+      // Wheelchair
+      graphics.fillStyle(0x2a2a2a, 1);
+      graphics.fillCircle(10, 23, 4);
+      graphics.fillCircle(22, 23, 4);
+      graphics.lineStyle(2, 0x888888, 1);
+      graphics.strokeLineShape(new Phaser.Geom.Line(10, 23, 22, 23));
+
+      // Tiny rainbow pennant
+      graphics.fillStyle(0xff3b30, 1); graphics.fillRect(22, 10, 5, 1);
+      graphics.fillStyle(0xff9500, 1); graphics.fillRect(22, 11, 5, 1);
+      graphics.fillStyle(0xffd60a, 1); graphics.fillRect(22, 12, 5, 1);
+      graphics.fillStyle(0x34c759, 1); graphics.fillRect(22, 13, 5, 1);
+      graphics.fillStyle(0x007aff, 1); graphics.fillRect(22, 14, 5, 1);
+      graphics.fillStyle(0xaf52de, 1); graphics.fillRect(22, 15, 5, 1);
+
+      graphics.generateTexture('pedestrian_wheelchair', 32, 32);
+      graphics.destroy();
+    }
+
     // Check if tiles texture exists
     if (!this.textures.exists('tiles')) {
       const graphics = this.add.graphics();

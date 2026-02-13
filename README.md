@@ -1,4 +1,4 @@
-# JAMY - Truck Driving Game
+# JAMY Pro Skater Truckmagedon
 
 A top-down truck driving game in pixel art style for web browsers. Drive an American-style truck, pick up cargo, and deliver it before time runs out!
 
@@ -78,7 +78,8 @@ The build output will be in the `dist/` directory.
 | **S** | Brake / Reverse |
 | **A** or **Q** | Turn left |
 | **D** | Turn right |
-| **SPACE** | Handbrake (emergency brake) |
+| **SHIFT** | Handbrake (emergency brake) |
+| **SPACE** | Jump (hop over obstacles briefly) |
 | **R** | Reset truck position |
 | **ESC** | Pause / Resume game |
 

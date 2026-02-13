@@ -2,6 +2,8 @@ import Phaser from 'phaser';
 import Truck from '../entities/Truck.js';
 import Trailer from '../entities/Trailer.js';
 import Obstacle from '../entities/Obstacle.js';
+import Squirrel from '../entities/Squirrel.js';
+import Pedestrian from '../entities/Pedestrian.js';
 import InputSystem from '../systems/InputSystem.js';
 import MissionSystem from '../systems/MissionSystem.js';
 import UISystem from '../systems/UISystem.js';
@@ -71,6 +73,11 @@ export default class GameScene extends Phaser.Scene {
     
     // Create particle emitters for effects
     this.createParticleEffects();
+
+    // Decorative wildlife
+    this.bloodTrailGraphics = this.add.graphics().setDepth(2);
+    this.createSquirrels();
+    this.createPedestrians();
   }
 
   createMap(mapWidth, mapHeight) {
@@ -79,42 +86,48 @@ export default class GameScene extends Phaser.Scene {
     
     // Determine grass color based on level
     const grassColor = this.levelKey === 'LEVEL_2' ? COLORS.LEVEL2_GRASS : COLORS.LEVEL1_GRASS;
+    const laneColor = 0xf4f0dd;
+    const shoulderColor = 0x6a6f73;
     
     // Grass background
     graphics.fillStyle(grassColor, 1);
     graphics.fillRect(0, 0, mapWidth, mapHeight);
     
-    // Main road (horizontal)
+    // Main roads (scaled to map size for better readability)
+    const horizontalRoadY = mapHeight * 0.52;
+    const verticalRoadX = mapWidth * 0.32;
+
+    graphics.fillStyle(shoulderColor, 1);
+    graphics.fillRect(0, horizontalRoadY - 116, mapWidth, 232);
+    graphics.fillRect(verticalRoadX - 116, 0, 232, mapHeight);
+
     graphics.fillStyle(COLORS.ROAD, 1);
-    graphics.fillRect(0, mapHeight / 2 - 100, mapWidth, 200);
-    
+    graphics.fillRect(0, horizontalRoadY - 94, mapWidth, 188);
+    graphics.fillRect(verticalRoadX - 94, 0, 188, mapHeight);
+
     // Road markings
-    graphics.lineStyle(3, 0xFFFFFF, 1);
-    for (let x = 0; x < mapWidth; x += 60) {
-      graphics.strokeLineShape(new Phaser.Geom.Line(x, mapHeight / 2, x + 30, mapHeight / 2));
+    graphics.lineStyle(4, laneColor, 0.9);
+    for (let x = 0; x < mapWidth; x += 84) {
+      graphics.strokeLineShape(new Phaser.Geom.Line(x, horizontalRoadY, x + 42, horizontalRoadY));
     }
-    
-    // Vertical road
-    graphics.fillStyle(COLORS.ROAD, 1);
-    graphics.fillRect(400, 0, 200, mapHeight);
-    
-    // Vertical road markings
-    for (let y = 0; y < mapHeight; y += 60) {
-      graphics.strokeLineShape(new Phaser.Geom.Line(500, y, 500, y + 30));
+
+    for (let y = 0; y < mapHeight; y += 84) {
+      graphics.strokeLineShape(new Phaser.Geom.Line(verticalRoadX, y, verticalRoadX, y + 42));
     }
-    
-    // Additional roads for level 2
-    if (this.levelKey === 'LEVEL_2') {
-      // Diagonal road
+
+    // Additional lane for larger missions
+    if (this.levelData.mapWidth >= 1800) {
+      const extraRoadX = mapWidth * 0.7;
+      graphics.fillStyle(shoulderColor, 1);
+      graphics.fillRect(extraRoadX - 96, 0, 192, mapHeight);
       graphics.fillStyle(COLORS.ROAD, 1);
-      graphics.fillRect(800, 0, 200, mapHeight);
-      
-      // Diagonal road markings
-      for (let y = 0; y < mapHeight; y += 60) {
-        graphics.strokeLineShape(new Phaser.Geom.Line(900, y, 900, y + 30));
+      graphics.fillRect(extraRoadX - 78, 0, 156, mapHeight);
+
+      for (let y = 0; y < mapHeight; y += 84) {
+        graphics.strokeLineShape(new Phaser.Geom.Line(extraRoadX, y, extraRoadX, y + 42));
       }
     }
-    
+
     // Parking areas at zones (use level-specific zones)
     const pickupZone = this.levelData.pickupZone;
     const deliveryZone = this.levelData.deliveryZone;
@@ -134,9 +147,9 @@ export default class GameScene extends Phaser.Scene {
     
     // Pickup zone (green)
     const pickupGraphics = this.add.graphics();
-    pickupGraphics.fillStyle(COLORS.PICKUP_ZONE, 0.3);
+    pickupGraphics.fillStyle(COLORS.PICKUP_ZONE, 0.24);
     pickupGraphics.fillRect(pickupZone.x, pickupZone.y, pickupZone.width, pickupZone.height);
-    pickupGraphics.lineStyle(3, COLORS.PICKUP_ZONE, 1);
+    pickupGraphics.lineStyle(3, COLORS.PICKUP_ZONE, 0.9);
     pickupGraphics.strokeRect(pickupZone.x, pickupZone.y, pickupZone.width, pickupZone.height);
     pickupGraphics.setDepth(1);
     
@@ -157,7 +170,7 @@ export default class GameScene extends Phaser.Scene {
       {
         fontSize: '16px',
         fontFamily: 'Arial',
-        color: '#00ff00',
+        color: '#d8f2de',
         stroke: '#000000',
         strokeThickness: 3,
         fontStyle: 'bold'
@@ -166,9 +179,9 @@ export default class GameScene extends Phaser.Scene {
     
     // Delivery zone (red)
     const deliveryGraphics = this.add.graphics();
-    deliveryGraphics.fillStyle(COLORS.DELIVERY_ZONE, 0.3);
+    deliveryGraphics.fillStyle(COLORS.DELIVERY_ZONE, 0.24);
     deliveryGraphics.fillRect(deliveryZone.x, deliveryZone.y, deliveryZone.width, deliveryZone.height);
-    deliveryGraphics.lineStyle(3, COLORS.DELIVERY_ZONE, 1);
+    deliveryGraphics.lineStyle(3, COLORS.DELIVERY_ZONE, 0.9);
     deliveryGraphics.strokeRect(deliveryZone.x, deliveryZone.y, deliveryZone.width, deliveryZone.height);
     deliveryGraphics.setDepth(1);
     
@@ -189,7 +202,7 @@ export default class GameScene extends Phaser.Scene {
       {
         fontSize: '16px',
         fontFamily: 'Arial',
-        color: '#ff0000',
+        color: '#f6d7d7',
         stroke: '#000000',
         strokeThickness: 3,
         fontStyle: 'bold'
@@ -211,12 +224,63 @@ export default class GameScene extends Phaser.Scene {
 
   setupCollisions() {
     // Truck collision with obstacles
-    this.physics.add.collider(this.truck, this.obstaclesGroup, this.onTruckCollision, null, this);
+    this.physics.add.collider(this.truck, this.obstaclesGroup, this.onTruckCollision, this.canTruckHitObstacles, this);
     
     // Trailer collision with obstacles (optional)
     if (this.trailer) {
       this.physics.add.collider(this.trailer, this.obstaclesGroup);
     }
+  }
+
+
+  canTruckHitObstacles() {
+    return !this.truck.isJumping;
+  }
+
+  createPedestrians() {
+    const palette = [0xff5cb8, 0x5ad06a, 0x55a7ff];
+    const count = Math.min(8, Math.max(4, Math.floor(this.levelData.mapWidth / 380)));
+
+    this.pedestrians = this.physics.add.group();
+
+    for (let i = 0; i < count; i++) {
+      const x = Phaser.Math.Between(120, this.levelData.mapWidth - 120);
+      const y = Phaser.Math.Between(120, this.levelData.mapHeight - 120);
+      const pedestrian = new Pedestrian(this, x, y, {
+        wheelchair: i % 4 === 0,
+        hairColor: palette[i % palette.length]
+      });
+      this.pedestrians.add(pedestrian);
+    }
+
+    this.physics.add.collider(this.pedestrians, this.obstaclesGroup);
+
+    const evade = (_vehicle, pedestrian) => {
+      pedestrian.pickNewDirection(this.truck.x, this.truck.y);
+      this.createAlertParticles(pedestrian.x, pedestrian.y);
+      this.truck.handleCollision();
+    };
+
+    this.physics.add.overlap(this.truck, this.pedestrians, evade);
+    if (this.trailer) {
+      this.physics.add.overlap(this.trailer, this.pedestrians, (_trailer, pedestrian) => {
+        pedestrian.pickNewDirection(this.trailer.x, this.trailer.y);
+        this.createAlertParticles(pedestrian.x, pedestrian.y);
+      });
+    }
+  }
+
+  createAlertParticles(x, y) {
+    const particles = this.add.particles(x, y, 'pixel', {
+      speed: { min: 40, max: 90 },
+      angle: { min: 0, max: 360 },
+      scale: { start: 1.2, end: 0 },
+      lifespan: 380,
+      quantity: 10,
+      tint: 0xf2cf5b
+    });
+
+    this.time.delayedCall(420, () => particles.destroy());
   }
 
   setupEvents() {
@@ -274,7 +338,7 @@ export default class GameScene extends Phaser.Scene {
       scale: { start: 2, end: 0 },
       lifespan: 600,
       quantity: 20,
-      tint: 0x00ff00,
+      tint: 0x82c08b,
       blendMode: 'ADD'
     });
     particles.setDepth(50);
@@ -292,7 +356,7 @@ export default class GameScene extends Phaser.Scene {
       scale: { start: 1.5, end: 0 },
       lifespan: 400,
       quantity: 15,
-      tint: 0xff4500,
+      tint: 0xc97b6d,
       blendMode: 'ADD'
     });
     particles.setDepth(50);
@@ -300,6 +364,48 @@ export default class GameScene extends Phaser.Scene {
     this.time.delayedCall(500, () => {
       particles.destroy();
     });
+  }
+
+  createSquirrels() {
+    const squirrelCount = Math.min(6, Math.max(3, Math.floor(this.levelData.mapWidth / 450)));
+    this.squirrels = this.physics.add.group();
+
+    for (let i = 0; i < squirrelCount; i++) {
+      const x = Phaser.Math.Between(120, this.levelData.mapWidth - 120);
+      const y = Phaser.Math.Between(120, this.levelData.mapHeight - 120);
+      const squirrel = new Squirrel(this, x, y);
+      this.squirrels.add(squirrel);
+    }
+
+    this.physics.add.collider(this.squirrels, this.obstaclesGroup);
+
+    this.physics.add.overlap(this.truck, this.squirrels, (_truck, squirrel) => {
+      const speed = Math.abs(this.truck.getSpeed());
+      if (!squirrel.isCrushed && speed > 140 && !this.truck.isJumping) {
+        squirrel.isCrushed = true;
+        this.paintRedTrail(squirrel.x, squirrel.y);
+        squirrel.destroy();
+      } else {
+        squirrel.pickNewDirection(this.truck.x, this.truck.y);
+      }
+    });
+
+    if (this.trailer) {
+      this.physics.add.overlap(this.trailer, this.squirrels, (_trailer, squirrel) => {
+        squirrel.pickNewDirection(this.trailer.x, this.trailer.y);
+      });
+    }
+  }
+
+  paintRedTrail(x, y) {
+    if (!this.bloodTrailGraphics) return;
+
+    this.bloodTrailGraphics.lineStyle(4, 0xa01717, 0.75);
+    const angle = this.truck.rotation + Phaser.Math.FloatBetween(-0.18, 0.18);
+    const len = Phaser.Math.Between(18, 34);
+    this.bloodTrailGraphics.strokeLineShape(
+      new Phaser.Geom.Line(x, y, x - Math.cos(angle) * len, y - Math.sin(angle) * len)
+    );
   }
 
   onTruckCollision(truck, obstacle) {
@@ -344,6 +450,19 @@ export default class GameScene extends Phaser.Scene {
     if (this.trailer) {
       this.trailer.updatePosition(delta);
     }
+
+    // Update wildlife
+    if (this.squirrels) {
+      this.squirrels.children.iterate((squirrel) => {
+        if (squirrel) squirrel.update(delta);
+      });
+    }
+
+    if (this.pedestrians) {
+      this.pedestrians.children.iterate((pedestrian) => {
+        if (pedestrian) pedestrian.update(delta);
+      });
+    }
     
     // Update mission system
     this.missionSystem.update(delta);
@@ -384,8 +503,20 @@ export default class GameScene extends Phaser.Scene {
     this.inputSystem.destroy();
     this.uiSystem.destroy();
     this.audioSystem.destroy();
+    if (this.squirrels) {
+      this.squirrels.clear(true, true);
+      this.squirrels = null;
+    }
+    if (this.pedestrians) {
+      this.pedestrians.clear(true, true);
+      this.pedestrians = null;
+    }
     this.events.off('cargoPickedUp');
     this.events.off('collision');
     this.events.off('missionEnd');
+    if (this.bloodTrailGraphics) {
+      this.bloodTrailGraphics.destroy();
+      this.bloodTrailGraphics = null;
+    }
   }
 }
