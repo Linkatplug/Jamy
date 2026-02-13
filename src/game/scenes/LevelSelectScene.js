@@ -3,7 +3,7 @@ import AudioSystem from '../systems/AudioSystem.js';
 import { LEVELS } from '../utils/constants.js';
 
 /**
- * LevelSelectScene - Choose between Level 1 and Level 2
+ * LevelSelectScene - Mission selection screen
  */
 export default class LevelSelectScene extends Phaser.Scene {
   constructor() {
@@ -12,155 +12,100 @@ export default class LevelSelectScene extends Phaser.Scene {
 
   create() {
     const { width, height } = this.cameras.main;
-    
-    // Initialize audio
     this.audioSystem = new AudioSystem(this);
-    
-    // Background
-    const bg = this.add.rectangle(width / 2, height / 2, width, height, 0x1a3a2e);
+
+    const bg = this.add.rectangle(width / 2, height / 2, width, height, 0x1f2b26);
     this.tweens.add({
       targets: bg,
-      fillColor: { from: 0x1a3a2e, to: 0x2a4a3e },
-      duration: 3000,
+      fillColor: { from: 0x1f2b26, to: 0x29372f },
+      duration: 3500,
       yoyo: true,
       repeat: -1
     });
-    
-    // Title
-    const title = this.add.text(width / 2, 50, '🗺️ SELECT LEVEL', {
-      fontSize: '48px',
+
+    this.add.text(width / 2, 48, 'SELECT MISSION', {
+      fontSize: '42px',
       fontFamily: 'Arial',
-      color: '#FFD700',
+      color: '#efe5c8',
       fontStyle: 'bold',
       stroke: '#000000',
-      strokeThickness: 5
+      strokeThickness: 4
     }).setOrigin(0.5);
-    
-    this.tweens.add({
-      targets: title,
-      scale: { from: 1, to: 1.05 },
-      duration: 1500,
-      yoyo: true,
-      repeat: -1,
-      ease: 'Sine.easeInOut'
+
+    const levelEntries = Object.entries(LEVELS);
+    const startY = 130;
+    const stepY = 108;
+
+    levelEntries.forEach(([levelKey, level], index) => {
+      const y = startY + index * stepY;
+      this.createLevelButton(width / 2, y, `Mission ${index + 1}`, level, levelKey);
     });
-    
-    // Level 1 button
-    const level1Y = height / 2 - 40;
-    const level1Button = this.createLevelButton(width / 2, level1Y, 'Level 1', 'LEVEL_1');
-    
-    // Level 2 button
-    const level2Y = height / 2 + 60;
-    const level2Button = this.createLevelButton(width / 2, level2Y, 'Level 2', 'LEVEL_2');
-    
-    // Level 2 might be locked initially
-    const level1Complete = localStorage.getItem('jamy_level1_complete') === 'true';
-    if (!level1Complete) {
-      level2Button.button.setStyle({ backgroundColor: '#444444', color: '#888888' });
-      level2Button.button.removeInteractive();
-      
-      this.add.text(width / 2, level2Y + 50, '🔒 Complete Level 1 to unlock', {
-        fontSize: '14px',
-        fontFamily: 'Arial',
-        color: '#888888'
-      }).setOrigin(0.5);
-    }
-    
-    // Back button
-    const backButton = this.add.text(width / 2, height - 50, '← BACK', {
-      fontSize: '24px',
+
+    const backButton = this.add.text(width / 2, height - 36, '← BACK', {
+      fontSize: '22px',
       fontFamily: 'Arial',
       color: '#ffffff',
-      backgroundColor: '#006400',
-      padding: { x: 25, y: 10 },
+      backgroundColor: '#3c4f45',
+      padding: { x: 20, y: 8 },
       stroke: '#000000',
       strokeThickness: 3
     }).setOrigin(0.5).setInteractive();
-    
+
     backButton.on('pointerover', () => {
-      backButton.setStyle({ backgroundColor: '#008000' });
+      backButton.setStyle({ backgroundColor: '#4f685b' });
       this.audioSystem.playClick();
-      this.tweens.add({ targets: backButton, scale: 1.1, duration: 100 });
     });
-    
+
     backButton.on('pointerout', () => {
-      backButton.setStyle({ backgroundColor: '#006400' });
-      this.tweens.add({ targets: backButton, scale: 1, duration: 100 });
+      backButton.setStyle({ backgroundColor: '#3c4f45' });
     });
-    
+
     backButton.on('pointerdown', () => {
       this.audioSystem.playPickup();
-      this.cameras.main.fade(200, 0, 0, 0);
-      this.time.delayedCall(200, () => {
-        this.audioSystem.destroy();
-        this.scene.start('MenuScene');
-      });
+      this.audioSystem.destroy();
+      this.scene.start('MenuScene');
     });
-    
-    // ESC to go back
+
     this.input.keyboard.once('keydown-ESC', () => {
       this.audioSystem.destroy();
       this.scene.start('MenuScene');
     });
   }
 
-  createLevelButton(x, y, label, levelKey) {
-    const level = LEVELS[levelKey];
-    
-    // Button background
-    const buttonBg = this.add.rectangle(x, y, 400, 100, 0x006400, 0.8);
-    buttonBg.setStrokeStyle(3, 0xFFD700);
-    
-    // Level name
-    const button = this.add.text(x, y - 20, label, {
-      fontSize: '32px',
+  createLevelButton(x, y, label, level, levelKey) {
+    const buttonBg = this.add.rectangle(x, y, 700, 88, 0x314339, 0.95);
+    buttonBg.setStrokeStyle(2, 0x7f8f86);
+
+    const button = this.add.text(x - 250, y, label, {
+      fontSize: '28px',
       fontFamily: 'Arial',
-      color: '#ffffff',
-      fontStyle: 'bold',
-      stroke: '#000000',
-      strokeThickness: 4
-    }).setOrigin(0.5).setInteractive();
-    
-    // Level details
-    const details = this.add.text(x, y + 15, 
-      `${level.name} - ${level.difficulty}`, {
-      fontSize: '16px',
+      color: '#f4efde',
+      fontStyle: 'bold'
+    }).setOrigin(0, 0.5).setInteractive();
+
+    const details = this.add.text(x - 40, y, `${level.name} · ${level.difficulty}`, {
+      fontSize: '20px',
       fontFamily: 'Arial',
-      color: '#cccccc'
-    }).setOrigin(0.5);
-    
-    // Interactive
+      color: '#c5d0c9'
+    }).setOrigin(0, 0.5);
+
     const elements = [buttonBg, button, details];
-    
+
     button.on('pointerover', () => {
-      buttonBg.setFillStyle(0x008000, 0.9);
+      buttonBg.setFillStyle(0x3d5448, 0.95);
       this.audioSystem.playClick();
-      this.tweens.add({
-        targets: elements,
-        scale: 1.05,
-        duration: 100
-      });
+      this.tweens.add({ targets: elements, scaleX: 1.01, scaleY: 1.01, duration: 100 });
     });
-    
+
     button.on('pointerout', () => {
-      buttonBg.setFillStyle(0x006400, 0.8);
-      this.tweens.add({
-        targets: elements,
-        scale: 1,
-        duration: 100
-      });
+      buttonBg.setFillStyle(0x314339, 0.95);
+      this.tweens.add({ targets: elements, scaleX: 1, scaleY: 1, duration: 100 });
     });
-    
+
     button.on('pointerdown', () => {
       this.audioSystem.playPickup();
-      this.cameras.main.flash(200, 255, 255, 255);
-      this.time.delayedCall(200, () => {
-        this.audioSystem.destroy();
-        // Pass level data to GameScene
-        this.scene.start('GameScene', { levelKey });
-      });
+      this.audioSystem.destroy();
+      this.scene.start('GameScene', { levelKey });
     });
-    
-    return { button, buttonBg, details };
   }
 }

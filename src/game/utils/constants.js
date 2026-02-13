@@ -1,8 +1,8 @@
 // Game constants
 
 // Screen dimensions (internal resolution - will be upscaled)
-export const GAME_WIDTH = 640;
-export const GAME_HEIGHT = 360;
+export const GAME_WIDTH = 1280;
+export const GAME_HEIGHT = 720;
 
 // Truck physics
 export const TRUCK_ACCELERATION = 200;
@@ -84,6 +84,87 @@ export const LEVELS = {
     ],
     spawnX: 100,
     spawnY: 100
+  },
+  LEVEL_3: {
+    name: 'Mission 3: Port Terminal',
+    difficulty: 'Medium+',
+    mapWidth: 2000,
+    mapHeight: 1100,
+    pickupZone: { x: 250, y: 880, width: 100, height: 100 },
+    deliveryZone: { x: 1650, y: 180, width: 120, height: 120 },
+    obstacles: [
+      { x: 450, y: 760, w: 100, h: 80 },
+      { x: 700, y: 860, w: 130, h: 60 },
+      { x: 980, y: 710, w: 90, h: 90 },
+      { x: 1240, y: 820, w: 120, h: 70 },
+      { x: 1470, y: 620, w: 80, h: 130 },
+      { x: 300, y: 470, w: 80, h: 110 },
+      { x: 640, y: 520, w: 140, h: 70 },
+      { x: 920, y: 470, w: 110, h: 60 },
+      { x: 1500, y: 400, w: 140, h: 80 },
+      { x: 1720, y: 540, w: 70, h: 100 },
+      { x: 360, y: 170, w: 90, h: 90 },
+      { x: 760, y: 210, w: 110, h: 80 },
+      { x: 1150, y: 150, w: 130, h: 70 }
+    ],
+    spawnX: 180,
+    spawnY: 930
+  },
+  LEVEL_4: {
+    name: 'Mission 4: Mountain Road',
+    difficulty: 'Hard',
+    mapWidth: 2100,
+    mapHeight: 1200,
+    pickupZone: { x: 1760, y: 930, width: 100, height: 100 },
+    deliveryZone: { x: 240, y: 180, width: 120, height: 120 },
+    obstacles: [
+      { x: 1680, y: 760, w: 110, h: 80 },
+      { x: 1400, y: 900, w: 90, h: 120 },
+      { x: 1160, y: 760, w: 120, h: 70 },
+      { x: 980, y: 930, w: 130, h: 80 },
+      { x: 760, y: 760, w: 90, h: 140 },
+      { x: 540, y: 920, w: 120, h: 90 },
+      { x: 360, y: 720, w: 80, h: 120 },
+      { x: 440, y: 500, w: 150, h: 80 },
+      { x: 700, y: 360, w: 120, h: 80 },
+      { x: 960, y: 500, w: 90, h: 120 },
+      { x: 1210, y: 360, w: 120, h: 70 },
+      { x: 1460, y: 470, w: 100, h: 90 },
+      { x: 1740, y: 350, w: 100, h: 110 },
+      { x: 900, y: 170, w: 130, h: 70 }
+    ],
+    spawnX: 1860,
+    spawnY: 980
+  },
+  LEVEL_5: {
+    name: 'Mission 5: Night Logistics',
+    difficulty: 'Expert',
+    mapWidth: 2300,
+    mapHeight: 1300,
+    pickupZone: { x: 260, y: 1020, width: 110, height: 110 },
+    deliveryZone: { x: 1970, y: 240, width: 130, height: 130 },
+    obstacles: [
+      { x: 420, y: 860, w: 140, h: 70 },
+      { x: 620, y: 1040, w: 100, h: 120 },
+      { x: 880, y: 900, w: 130, h: 80 },
+      { x: 1110, y: 1090, w: 80, h: 110 },
+      { x: 1340, y: 930, w: 140, h: 90 },
+      { x: 1570, y: 1080, w: 100, h: 90 },
+      { x: 1790, y: 860, w: 120, h: 120 },
+      { x: 1980, y: 1030, w: 90, h: 120 },
+      { x: 580, y: 640, w: 130, h: 90 },
+      { x: 840, y: 530, w: 100, h: 100 },
+      { x: 1090, y: 650, w: 120, h: 80 },
+      { x: 1370, y: 510, w: 90, h: 120 },
+      { x: 1620, y: 630, w: 130, h: 70 },
+      { x: 1880, y: 500, w: 90, h: 110 },
+      { x: 430, y: 320, w: 110, h: 80 },
+      { x: 760, y: 240, w: 130, h: 70 },
+      { x: 1160, y: 200, w: 110, h: 90 },
+      { x: 1470, y: 180, w: 130, h: 70 }
+    ],
+    spawnX: 180,
+    spawnY: 1100
   }
 };
 
@@ -116,11 +197,11 @@ export const CONTROLS = {
 
 // Colors
 export const COLORS = {
-  PICKUP_ZONE: 0x00ff00,
-  DELIVERY_ZONE: 0xff0000,
-  ROAD: 0x444444,
-  GRASS: 0x228B22,
-  OBSTACLE: 0x8B4513,
-  LEVEL1_GRASS: 0x228B22,
-  LEVEL2_GRASS: 0x3a5f0b
+  PICKUP_ZONE: 0x6bbf7a,
+  DELIVERY_ZONE: 0xbf6b6b,
+  ROAD: 0x4e5357,
+  GRASS: 0x415b41,
+  OBSTACLE: 0x6e5a48,
+  LEVEL1_GRASS: 0x415b41,
+  LEVEL2_GRASS: 0x4d5e3a
 };
